@@ -1,0 +1,55 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+         <script type="text/javascript" src="jquery.ontologybrowser.js"></script>
+         <script>
+             $(function(){
+                $("table#table1 th").ontologyBrowser();
+                $("table#table2 th").ontologyBrowser();
+                
+             });
+         </script>
+  
+    </head>
+    <body>
+        <table id="table1">
+            <thead>
+            <th>Donor Name</th>
+            <th>Donor Institute Code</th>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Test</td>
+                    <td>Another</td>
+                </tr>
+                <tr>
+                    <td>Test</td>
+                    <td>Another</td>
+                </tr>
+            </tbody>
+        </table>
+        <table id="table2">
+            <thead>
+            <th>Donor Name</th>
+            <th>Donor Institute Code</th>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Test</td>
+                    <td>Another</td>
+                </tr>
+                <tr>
+                    <td>Test</td>
+                    <td>Another</td>
+                </tr>
+            </tbody>
+        </table>
+    </body>
+</html>
