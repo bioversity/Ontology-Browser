@@ -10,6 +10,8 @@ $(function(){
     $(document.head).append("<style>.tip_form {    z-index: 1000;    text-align: left;    border-radius: 4px;    -moz-border-radius: 4px;    -webkit-border-radius: 4px;    padding: 8px 8px;    max-width: 400px;    color: #FFFFFF;    background-color: #000000;    text-align: left;    font-size: 12px;}.tip_form .tip-inner {    font-size: 100%;}.tip_form .tip-arrow-top {    margin-top: -5px;    margin-left: -5px; /* approx. half the width to center it */    top: 0;    left: 50%;    width: 9px;    height: 5px;}.tip_form .tip-arrow-right {    margin-top: -4px; /* approx. half the height to center it */    margin-left: 0;    top: 50%;    left: 100%;    width: 5px;    height: 9px;}.tip_form .tip-arrow-bottom {    margin-top: 0;    margin-left: -5px; /* approx. half the width to center it */    top: 100%;    left: 50%;    width: 9px;    height: 5px;}.tip_form .tip-arrow-left {    margin-top: -4px; /* approx. half the height to center it */    margin-left: -5px;    top: 50%;    left: 0;    width: 5px;    height: 9px;}</style>")
 })
 
+var CROPONTOLOGY_URL = "http://www.cropontology.org";
+
 // // the semi-colon before function invocation is a safety net against concatenated 
 // scripts and/or other plugins which may not be closed properly.
 ;(function ( $, window, document, undefined ) {
@@ -56,17 +58,15 @@ $(function(){
             fade: false,
             slide: false,
             content: function(updateCallback) {
-                search($elem.text(), function(data) {    
+                search($elem.text(), function(data) { 
                     var content = "";
                     if(!data) {
-                        content = "Error : Access to restricted URI denied"
-                    }
-                    else if(data.length) {
-                        content = buildOntologyTree(data);
+                        updateCallback("Error : Access to restricted URI denied");
+                    } else if(data.length) {
+                        buildOntologyTree(data, updateCallback);
                     } else {
-                        content = listOntologies();
+                        listOntologies(updateCallback);
                     }
-                    updateCallback(content);
                 });
                 return 'Loading...';
             }
@@ -74,13 +74,11 @@ $(function(){
         $elem.poshytip('show');
     }
     function search(text, callback) {
-        $.getJSON("data.json", callback)
+        $.getJSON(CROPONTOLOGY_URL + "/search?callback=?&q=" + text, callback)
             .error(function(){ 
-                setTimeout(function(){
-                    callback(false);
-                }, 500);
-                
+                callback(false);  
             });
+            
     }
     
     function bindClick(elem){
@@ -89,38 +87,153 @@ $(function(){
             openDialog($elem);
         })
     }
-    
+    /*
+ *
+ * @returns a jquery dom element
+ */
+function makeLi(obj, last) {
+ 
+    // generic attributes
+    var id = obj.id;
+    var name = obj.name;
+    var label = obj.label;
+    var summary = obj.name;
+    var has_children = obj.has_children,
+        relationship = obj.relationship,
+        hitarea,
+        has_method = (!obj.has_children && obj.method && obj.method !== "null");
+
+    var li = $("<li></li>");
+    if(last)
+        li.addClass("last");
+ 
+    // add a hidden input to track the id of this node
+    li.append('<input type="hidden" class="id" value="'+id+'" />');
+ 
+    if(has_children || has_method){
+        li.addClass("expandable");
+        hitarea = $('<div class="hitarea expandable-hitarea"></div>'); 
+        li.append(hitarea);
+    }
+    if(last && (has_children || has_method)) {
+        li.addClass("lastExpandable");
+        hitarea.addClass("lastExpandable-hitarea");
+    }
+
+ 
+    var link = $('<a title="'+summary+'" class="minibutton btn-watch" id="'+id+'"><span>'+name+'</span></a>');
+ 
+    link.click(function(e) {
+        alert('e');
+        /*load_term(li);
+        e.preventDefault();
+        e.stopPropagation();*/
+    });
+ 
+    li.append(link);
+
+    if(relationship) {
+        var rel = $("<span class='relationship "+relationship+"' title='"+relationship+"'>"+relationship+"</span>");
+
+    //    li.append(rel);
+
+    }
+ 
+    if(label)
+        li.append('<div class="meta">'+label+'</div>');
+ 
+    // last child
+    if(has_children){
+        li.append('<ul style="display:none;"></ul>');
+ 
+        // assign click events for expansion/collapse
+        //expand_collapse(li);
+    }
+
+    // if it's the last leaf node and it has a method
+    // just show it as a child
+    if(has_method) { 
+        li.append(methodScale(obj));
+    }
+ 
+    return li;
+}
     /*
      * @input: arr -> build the tree from the list of term
      * @return: the tree html
      */
-    function buildOntologyTree(arr){
-               
+    function buildOntologyTree(arr, updateCallback){
+        var html = "";
         for (var i=0; i<arr.length; i++){ // for each search result
-            var term = arr[i];
-            $.getJSON("/get-term-parents/"+term.id, function(data) {
-                //var $root = $("#root");
+            var term = arr[i];            
+            $.getJSON(CROPONTOLOGY_URL + "/get-term-parents/" +term.id + "?callback=?", function(data) { 
+                var $root = $("<div></div>");
                 for(var x=0; x<data.length; x++) { // for each relationship
-                    console.log(data[x])
-                    //var parent = $root;
+                    var parent;
                     var li;
-                    /*
-                    for(var i=0, len=data[x].length; i<len; i++) { // from parent to child
+                    for(var i=0; i<data[x].length; i++) { // from parent to child
                         var el = data[x][i];
                         el.has_children = true;
                         if(i == (data[x].length-1))
                             el.has_children = false;
-
+                        var elemId = el.id.replace(":","");
+                        if (i == 0 && !$root.hasClass(elemId)) {
+                            console.log("first one")
+                            $root.attr('class', elemId);
+                            parent = $root;
+                        }
+                        else if(i == 0 && $root.hasClass(elemId)) {
+                            console.log("inside ul")
+                            parent = $root.find("ul:first");;
+                            continue;                         
+                        } 
                         li = makeLi(el, true);
+                        // if(!parent.hasClass(elemId))
                         parent.append(li);
                         // parent becomes the first ul inside this li
                         parent = li.find("ul:first");
-                        parent.show();
+                        parent.show();                     
                     }
-                    */
+                    
                 }
+                
+                html += $root.html();
+              //  console.log(html)
+                updateCallback(html);
             });
         }
+    }
+
+    /*
+     * @input: json -> build the tree from the list of term
+     * @return: the tree html
+     */
+    function tree(json, parent, root){
+        if (json != null){
+            if (parent == null)
+                root = pop(json);
+            var ul; 
+            var li;
+            if (jQuery.contains(root.id, document.getElementById(root.id))){
+                var child = pop(json);
+                li.setAttribute('id',parent.id)
+                tree(json, child, root);
+            }
+            else{
+                var child = pop(json);
+                li.setAttribute('id', root.id);
+                tree(json,child,root);
+            }
+        }
+        else
+            return ul;
+    }
+    
+    function listOntologiesCallback(data) {
+        console.log(data)
+    }
+    function listOntologies(updateCallback){
+        return $.getJSON("http://www.cropontology.org/get-ontologies", listOntologiesCallback);
     }
 
     
