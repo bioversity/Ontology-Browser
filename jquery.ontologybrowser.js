@@ -327,7 +327,7 @@ function makeLiRoot(obj, last) {
         });
     }
 /*
- * function listOntologiesCallback(data) {
+  function listOntologiesCallback(data) {
         var obj = JSON.stringify(data, function(key, value){
             var $root = $("<div></div>");
             var parent = $root;
