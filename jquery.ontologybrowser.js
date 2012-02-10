@@ -124,7 +124,7 @@ function makeLi(obj, last) {
     var link = $('<a title="'+summary+'" class="minibutton btn-watch" id="'+id+'" onclick=\'alert("'+id+'")\'><span>'+name+'</span></a>');
  
     link.click(function(e) {
-       /* load_term(li);
+     /*   load_term(li);
         e.preventDefault();
         e.stopPropagation();*/
     });
@@ -177,12 +177,10 @@ function makeLi(obj, last) {
                             el.has_children = false;
                         var elemId = el.id.replace(":","");
                         if (i == 0 && !$root.hasClass(elemId)) {
-                            console.log("first one")
                             $root.attr('class', elemId);
                             parent = $root;
                         }
                         else if(i == 0 && $root.hasClass(elemId)) {
-                            console.log("inside ul")
                             parent = $root.find("ul:first");;
                             continue;                         
                         } 
@@ -197,7 +195,6 @@ function makeLi(obj, last) {
                 }
                 
                 html += $root.html();
-              //  console.log(html)
                 updateCallback(html);
             });
         }
@@ -321,7 +318,6 @@ function makeLiRoot(obj, last) {
                        
                     });
             });
-            console.log($root.html());
             html += $root.html();
             updateCallback(html);
         });
@@ -348,6 +344,10 @@ function makeLiRoot(obj, last) {
         });
     }
  */
+
+function callbackOnClick(data){
+    console.log(data);
+}
     
     Plugin.prototype.init = function () {
         // Place initialization logic here
@@ -365,8 +365,8 @@ function makeLiRoot(obj, last) {
             }
         }); 
     }
-    $[pluginName] = {       
-        search: search
+    $[pluginName] = { 
+       search: search
     }
 
 })( jQuery, window, document );
