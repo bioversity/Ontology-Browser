@@ -121,11 +121,10 @@ function makeLi(obj, last) {
     }
 
  
-    var link = $('<a title="'+summary+'" class="minibutton btn-watch" id="'+id+'"><span>'+name+'</span></a>');
+    var link = $('<a title="'+summary+'" class="minibutton btn-watch" id="'+id+'" onclick=\'alert("'+id+'")\'><span>'+name+'</span></a>');
  
     link.click(function(e) {
-        alert('e');
-        /*load_term(li);
+       /* load_term(li);
         e.preventDefault();
         e.stopPropagation();*/
     });
@@ -229,13 +228,126 @@ function makeLi(obj, last) {
             return ul;
     }
     
-    function listOntologiesCallback(data) {
-        console.log(data)
+/*
+ *
+ * @returns a jquery dom element
+ */
+function makeLiRoot(obj, last) {
+    // generic attributes
+    var id = obj.ontology_id;
+    var name = obj.ontology_name;
+    var label = obj.label;
+    var summary = obj.ontology_summary;
+    var has_children = obj.has_children,
+        relationship = obj.relationship,
+        hitarea,
+        has_method = (!obj.has_children && obj.method && obj.method !== "null");
+
+    var li = $("<li></li>");
+    if(last)
+        li.addClass("last");
+ 
+    // add a hidden input to track the id of this node
+    li.append('<input type="hidden" class="id" value="'+id+'" />');
+ 
+    if(has_children || has_method){
+        li.addClass("expandable");
+        hitarea = $('<div class="hitarea expandable-hitarea"></div>'); 
+        li.append(hitarea);
     }
-    function listOntologies(updateCallback){
-        return $.getJSON("http://www.cropontology.org/get-ontologies", listOntologiesCallback);
+    if(last && (has_children || has_method)) {
+        li.addClass("lastExpandable");
+        hitarea.addClass("lastExpandable-hitarea");
     }
 
+ 
+    var link = $('<a title="'+summary+'" class="minibutton btn-watch" id="'+id+'" onclick=\'alert("'+id+'")\'><span>'+name+'</span></a>');
+ 
+    link.click(function(e) {
+       /* load_term(li);
+        e.preventDefault();
+        e.stopPropagation();*/
+    });
+ 
+    li.append(link);
+
+    if(relationship) {
+        var rel = $("<span class='relationship "+relationship+"' title='"+relationship+"'>"+relationship+"</span>");
+
+    //    li.append(rel);
+
+    }
+ 
+    if(label)
+        li.append('<div class="meta">'+label+'</div>');
+ 
+    // last child
+    if(has_children){
+        li.append('<ul style="display:none;"></ul>');
+ 
+        // assign click events for expansion/collapse
+        //expand_collapse(li);
+    }
+
+    // if it's the last leaf node and it has a method
+    // just show it as a child
+    if(has_method) { 
+        li.append(methodScale(obj));
+    }
+ 
+    return li;
+}
+    /*
+     * @input: data -> json from get-ontologies
+     * @return: the tree with all ontologies
+     */
+    function listOntologies(updateCallback){
+      //  return $.getJSON("http://www.cropontology.org/get-ontologies", listOntologiesCallback);
+        var html = "";
+        $.getJSON("data.json", function(data) {
+            var $root = $("<div></div>");
+            var obj = JSON.stringify(data, function(key, value){
+                if (typeof value==='object')
+                    $.each(value, function(i,arr){
+                        for(var i=0; i<arr.length; i++){
+                            var parent = $root;
+                            var li;
+                            var el = arr[i];
+                            li = makeLiRoot(el, true);
+                            parent.append(li);
+                            parent = li.find("ul:first");
+                            parent.show();
+                        }
+                       
+                    });
+            });
+            console.log($root.html());
+            html += $root.html();
+            updateCallback(html);
+        });
+    }
+/*
+ * function listOntologiesCallback(data) {
+        var obj = JSON.stringify(data, function(key, value){
+            var $root = $("<div></div>");
+            var parent = $root;
+            if (typeof value==='object')
+                $.each(value, function(i,arr){
+                    for(var i=0; i<arr.length; i++){
+                        var li;
+                        var el = arr[i];
+                        li = makeLiRoot(el, true);
+                        parent.append(li);
+                        parent = li.find("ul:first");
+                        parent.show();
+                    }
+                    console.log($root.html());
+            return $root.html;
+                });
+            
+        });
+    }
+ */
     
     Plugin.prototype.init = function () {
         // Place initialization logic here
