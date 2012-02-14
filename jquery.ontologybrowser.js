@@ -102,7 +102,6 @@ function bindClick(elem){
  * @returns a jquery dom element
  */
 function makeLi(obj, last) {
- 
     // generic attributes
     var id = obj.id;
     var name = obj.name;
@@ -110,8 +109,8 @@ function makeLi(obj, last) {
     var summary = obj.name;
     var has_children = obj.has_children,
         relationship = obj.relationship,
-        hitarea,
-        has_method = (!obj.has_children && obj.method && obj.method !== "null");
+        hitarea;
+        //has_method = (!obj.has_children && obj.method && obj.method !== "null");
 
     var li = $("<li></li>");
     if(last)
@@ -120,15 +119,12 @@ function makeLi(obj, last) {
     // add a hidden input to track the id of this node
  //   li.append('<input type="hidden" class="id" value="'+id+'" />');
  
-    if(has_children || has_method){
+    if(has_children){
         li.addClass("expandable");
         hitarea = $('<div class="hitarea expandable-hitarea"></div>'); 
         li.append(hitarea);
     }
-    if(last && (has_children || has_method)) {
-        li.addClass("lastExpandable");
-        hitarea.addClass("lastExpandable-hitarea");
-    }
+
 
  
     var link = $('<a title="'+summary+'" class="minibutton btn-watch"><span id="'+id+'">'+name+'</span></a>');
@@ -156,9 +152,9 @@ function makeLi(obj, last) {
 
     // if it's the last leaf node and it has a method
     // just show it as a child
-    if(has_method) { 
-        li.append(methodScale(obj));
-    }
+//    if(has_method) { 
+   //     li.append(methodScale(obj));
+   // }
  
     return li;
 }
@@ -182,14 +178,17 @@ function buildOntologyTree(searchResult, updateCallback){
                             el.has_children = false;
                         var elemId = el.id.replace(":","");
                         if (i == 0 && !$root.hasClass(elemId)) {
-                            $root.attr('class', "expandable "+elemId);
+                            $root.attr('class', "treeview "+elemId);
                             parent = $root;
                         }
                         else if(i == 0 && $root.hasClass(elemId)) {
                             parent = $root.find("ul:first");;
                             continue;                         
                         } 
-                        li = makeLi(el, true);
+                        if (i==1 && el.has_children && x!=data.length-1)
+                            li = makeLi(el, false);
+                        else
+                            li = makeLi(el, true);
                         // if(!parent.hasClass(elemId))
                         parent.append(li);
                         // parent becomes the first ul inside this li
@@ -239,24 +238,24 @@ function makeLiOntology(obj, last, updateCallback) {
     var name = obj.ontology_name;
     var label = obj.label;
     var summary = obj.ontology_summary;
-    var has_children = obj.has_children,
+    var has_children = last,
         relationship = obj.relationship,
         hitarea,
         has_method = (!obj.has_children && obj.method && obj.method !== "null");
 
     var li = $("<li></li>");
-    if(last)
+    if(last){
         li.addClass("last");
  
     // add a hidden input to track the id of this node
     //li.append('<input type="hidden" class="id" value="'+id+'" />');
  
-    if(has_children || has_method){
+   // if(has_children || has_method){
         li.addClass("expandable");
         hitarea = $('<div class="hitarea expandable-hitarea"></div>'); 
         li.append(hitarea);
-    }
-    if(last && (has_children || has_method)) {
+  //  }
+   // if(last && (has_children || has_method)) {
         li.addClass("lastExpandable");
         hitarea.addClass("lastExpandable-hitarea");
     }
@@ -303,7 +302,7 @@ function listOntologies(updateCallback){
       //  return $.getJSON("http://www.cropontology.org/get-ontologies?callback=?", listOntologiesCallback);
         var $html = $("<div></div>");
         $.getJSON("http://www.cropontology.org/get-ontologies?callback=?", function(data) {
-            var $root = $("<div></div>");
+            var $root = $("<ul class='treeview'></ul>");
             var obj = JSON.stringify(data, function(key, value){
                 if (typeof value==='object')
                     $.each(value, function(i,arr){
