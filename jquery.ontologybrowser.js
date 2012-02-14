@@ -7,12 +7,18 @@
 
 
 
-var CROPONTOLOGY_URL = "http://www.cropontology.org";
-
 // // the semi-colon before function invocation is a safety net against concatenated 
 // scripts and/or other plugins which may not be closed properly.
 ;(function ( $, window, document, undefined ) {
+    
 
+    var CROPONTOLOGY_URL = "http://www.cropontology.org";
+    /*
+    *  @var oneTime: array used to check if you have jet called the fucntion
+    *  @var exclude: var used in openDialog to exclude following call
+    */
+    var oneTime = [],
+          onClick;
     // undefined is used here as the undefined global variable in ECMAScript 3 is
     // mutable (ie. it can be changed by someone else). undefined isn't really being
     // passed in so we can ensure the value of it is truly undefined. In ES5, undefined
@@ -27,28 +33,81 @@ var CROPONTOLOGY_URL = "http://www.cropontology.org";
         defaults = {
             propertyName: "value"
         };
+/*
+ * takes care of assigning proper
+ * click events for expanding this li
+ */
+(function expand_collapse() {
+    var div = $(".hitarea");
+ 
+    div.live("click", function() {
+ 
+        var $this = $(this);
 
+        var li = $this.parent();
+
+        var parent = li.find("ul").first();
+ 
+ 
+        // check whether we need to expand or collapse
+        if(li.hasClass("collapsable")) { // collapsing
+            li.removeClass("collapsable");
+            li.addClass("expandable");
+            var hitarea = li.find(".hitarea").first();
+            hitarea.removeClass("collapsable-hitarea");
+            hitarea.addClass("expandable-hitarea");
+            if(li.hasClass("lastCollapsable")) {
+                li.removeClass("lastCollapsable");
+                li.addClass("lastExpandable");
+                hitarea.removeClass("lastCollapsable-hitarea");
+                hitarea.addClass("lastExpandable-hitarea");
+            }
+ 
+            // let's clear the ul contents
+            parent.hide();
+ 
+ 
+        } else if(li.hasClass("expandable")) { // expanding
+            li.removeClass("expandable");
+            li.addClass("collapsable");
+            var hitarea = li.find(".hitarea").first();
+            hitarea.removeClass("expandable-hitarea");
+            hitarea.addClass("collapsable-hitarea");
+            if(li.hasClass("lastExpandable")) {
+                li.removeClass("lastExpandable");
+                li.addClass("lastCollapsable");
+                hitarea.removeClass("lastExpandable-hitarea");
+                hitarea.addClass("lastCollapsable-hitarea");
+            }
+ 
+            // if parent contains a filled UL, dont run the ajax call again, just show it
+            if(parent.children().length) {
+                parent.show();
+            } else {
+ 
+                var id = li.find(".id").val();
+                
+                if($this.hasClass("ontology-hitarea")) {
+                    load_branch(parent, "/get-ontology-roots/"+id+"?callback=?");
+                } else {                   
+                    load_branch(parent, "/get-children/"+id+"?callback=?");
+                }
+                
+            }
+ 
+        }
+ 
+    });
+})();
     // The actual plugin constructor
-function Plugin( element, options ) {
+function Plugin( element) {
     this.element = element;
-
-    // jQuery has an extend method which merges the contents of two or 
-    // more objects, storing the result in the first object. The first object
-    // is generally empty as we don't want to alter the default options for
-    // future instances of the plugin
-    this.options = $.extend( {}, defaults, options) ;
 
     this._defaults = defaults;
     this._name = pluginName;
 
     this.init();
 }
-
-/*
-*  @var oneTime: array used to check if you have jet called the fucntion
-*  @var exclude: var used in openDialog to exclude following call
-*/
-var oneTime = [];
 
 /*
  * @return: build the dialog calling varius function to create the tree
@@ -103,12 +162,21 @@ function bindClick(elem){
  */
 function makeLi(obj, last) {
     // generic attributes
-    var id = obj.id;
-    var name = obj.name;
-    var label = obj.label;
-    var summary = obj.name;
-    var has_children = obj.has_children,
-        relationship = obj.relationship,
+    if(obj.ontology_id) {
+        // is an ontology
+        var id = obj.ontology_id;
+        var name = obj.ontology_name;
+        var label = obj.label;
+        var summary = obj.ontology_summary;
+        var has_children = true;
+    } else {
+        var id = obj.id;
+        var name = obj.name;
+        var label = obj.label;
+        var summary = obj.name;
+        var has_children = obj.has_children;
+    }
+    var relationship = obj.relationship,
         hitarea;
         //has_method = (!obj.has_children && obj.method && obj.method !== "null");
 
@@ -117,25 +185,35 @@ function makeLi(obj, last) {
         li.addClass("last");
  
     // add a hidden input to track the id of this node
- //   li.append('<input type="hidden" class="id" value="'+id+'" />');
+    li.append('<input type="hidden" class="id" value="'+id+'" />');
  
     if(has_children){
         li.addClass("expandable");
         hitarea = $('<div class="hitarea expandable-hitarea"></div>'); 
+        if(obj.ontology_id) hitarea.addClass("ontology-hitarea");
+
         li.append(hitarea);
     }
-
-
+    if(last && (has_children)) {
+        li.addClass("lastExpandable");
+        hitarea.addClass("lastExpandable-hitarea");
+    }
+    
+     if(last && (!has_children)) {
+        li.addClass("leaf");
+    }
  
     var link = $('<a title="'+summary+'" class="minibutton btn-watch"><span id="'+id+'">'+name+'</span></a>');
-    link.click(callbackOnClick);
+    link.click(function(){
+        onClick(id);
+    });
  
     li.append(link);
 
     if(relationship) {
         var rel = $("<span class='relationship "+relationship+"' title='"+relationship+"'>"+relationship+"</span>");
 
-    //    li.append(rel);
+        li.append(rel);
 
     }
  
@@ -194,8 +272,7 @@ function buildOntologyTree(searchResult, updateCallback){
                         // parent becomes the first ul inside this li
                         parent = li.find("ul:first");
                         parent.show();                     
-                    }
-                    
+                    }   
                 }
                 
                 $html.append($root)
@@ -205,102 +282,14 @@ function buildOntologyTree(searchResult, updateCallback){
     }
 
     /*
-     * @input: json -> build the tree from the list of term
-     * @return: the tree html
-     */
-function tree(json, parent, root){
-        if (json != null){
-            if (parent == null)
-                root = pop(json);
-            var ul; 
-            var li;
-            if (jQuery.contains(root.id, document.getElementById(root.id))){
-                var child = pop(json);
-                li.setAttribute('id',parent.id)
-                tree(json, child, root);
-            }
-            else{
-                var child = pop(json);
-                li.setAttribute('id', root.id);
-                tree(json,child,root);
-            }
-        }
-        else
-            return ul;
-    }
-    
-/*
- * @returns a jquery dom element
- */
-function makeLiOntology(obj, last, updateCallback) {
-    // generic attributes
-    var id = obj.ontology_id;
-    var name = obj.ontology_name;
-    var label = obj.label;
-    var summary = obj.ontology_summary;
-    var has_children = last,
-        relationship = obj.relationship,
-        hitarea,
-        has_method = (!obj.has_children && obj.method && obj.method !== "null");
-
-    var li = $("<li></li>");
-    if(last){
-        li.addClass("last");
- 
-    // add a hidden input to track the id of this node
-    //li.append('<input type="hidden" class="id" value="'+id+'" />');
- 
-   // if(has_children || has_method){
-        li.addClass("expandable");
-        hitarea = $('<div class="hitarea expandable-hitarea"></div>'); 
-        li.append(hitarea);
-  //  }
-   // if(last && (has_children || has_method)) {
-        li.addClass("lastExpandable");
-        hitarea.addClass("lastExpandable-hitarea");
-    }
-
- 
-    var link = $('<a title="'+summary+'" class="minibutton btn-watch"><span id="'+id+'">'+name+'</span></a>');
-    link.click(function(e){
-        openOntology(id, updateCallback);
-    });
- 
-    li.append(link);
-
-    if(relationship) {
-        var rel = $("<span class='relationship "+relationship+"' title='"+relationship+"'>"+relationship+"</span>");
-
-    //    li.append(rel);
-
-    }
- 
-    if(label)
-        li.append('<div class="meta">'+label+'</div>');
- 
-    // last child
-    if(has_children){
-        li.append('<ul style="display:none;"></ul>');
- 
-        // assign click events for expansion/collapse
-        //expand_collapse(li);
-    }
-
-    // if it's the last leaf node and it has a method
-    // just show it as a child
-    if(has_method) { 
-        li.append(methodScale(obj));
-    }
- 
-    return li;
-}
-    /*
      * @input: data -> json from get-ontologies
      * @return: the tree with all ontologies
      */
 function listOntologies(updateCallback){
       //  return $.getJSON("http://www.cropontology.org/get-ontologies?callback=?", listOntologiesCallback);
         var $html = $("<div></div>");
+        // search 
+        $html.append($('<div><input type="text" tabindex="0" placeholder="Search" name="q" id="search" autocomplete="off" class="ac_input"></div>'))
         $.getJSON("http://www.cropontology.org/get-ontologies?callback=?", function(data) {
             var $root = $("<ul class='treeview'></ul>");
             var obj = JSON.stringify(data, function(key, value){
@@ -310,7 +299,7 @@ function listOntologies(updateCallback){
                             var parent = $root;
                             var li;
                             var el = arr[i];
-                            li = makeLiOntology(el, true, updateCallback);
+                            li = makeLi(el, true);
                             parent.append(li);
                             parent = li.find("ul:first");
                             parent.show();
@@ -335,24 +324,43 @@ function callbackOnClick(e){
     window.open("http://www.cropontology.org/terms/"+e.target.attributes['id'].value+"/");
 }
 
-function openOntology(ontologyId, updateCallback){
-    //var id = e.target.attributes['id'].value;
-    var $cont = $("<div></div>");
-    $.getJSON("http://www.cropontology.org/get-ontology-roots/"+ontologyId+"?callback=?", function(roots) {
-        for(var i=0, len=roots.length; i<len; i++) {
+
+function loader(parent, show){
+    var jimg = $("<img>").attr("src", "images/metabox_loader.gif");
+    if(show) {
+        jimg.insertBefore(parent);
+    } else { // hide
+        $(parent).prev().remove();
+    }
+}
+/*
+ * loads a single branch given an array of objects
+ * @parent - the container of the branch, a jquery DOM element; 
+ *           this gets populated with the elements
+ * @url - the json array of objects to do an AJAX request to
+ */
+function load_branch(parent, url) {
+    var obj, li;
+    // insert before the parent a loading image
+    loader(parent, true);
+    parent.show();
+    $.getJSON(CROPONTOLOGY_URL+url, function(children) {      
+        for(var i=0,len=children.length; i<len; i++) {
+            var child = children[i];
             var last = false;
-            if(i == (roots.length-1))
+            if(i == (children.length-1))
                 last = true;
+            // check if parent of current branch has root
+            if(parent.parent().find(".ontology-hitarea").length) {
+                child.has_children = true;
+            }
+            var li = makeLi(child, last);
+            parent.append(li);          
+        }      
+        loader(parent, false);
+    });
+}
 
-            // roots always have children :)
-            roots[i].has_children = true;
-
-            var li = makeLi(roots[i], last);
-            $cont.append(li);
-        }
-        updateCallback($cont);
-    });    
-}  
    
     Plugin.prototype.init = function () {
         // Place initialization logic here
@@ -363,10 +371,11 @@ function openOntology(ontologyId, updateCallback){
     
     // A really lightweight plugin wrapper around the constructor, 
     // preventing against multiple instantiations
-    $.fn[pluginName] = function ( options ) { 
+    $.fn[pluginName] = function (cb) { 
+        onClick = cb;
         return this.each(function () {
             if (!$.data(this, 'plugin_' + pluginName)) {
-                $.data(this, 'plugin_' + pluginName, new Plugin( this, options ));
+                $.data(this, 'plugin_' + pluginName, new Plugin(this));
             }
         }); 
     }

@@ -5,12 +5,14 @@
     -moz-border-radius: 4px;    
     -webkit-border-radius: 4px;    
     padding: 8px 8px;    
-    max-width: 400px;    
     color: black    ;    
     border: 2px solid #DDDDDD;
     background-color: white;    
     text-align: left;    
     font-size: 12px;
+    overflow: auto;
+    height: 400px;
+    max-width: 400px;
 }
 .tip_form .tip-inner {    
     font-size: 100%;
@@ -151,4 +153,16 @@ button.minibutton::-moz-focus-inner {
     height: 24px;
     line-height: 24px;
     padding: 0 10px 0 8px;
+}
+.relationship {
+    background: none repeat scroll 0 0 #4183C4;
+    border-radius: 2px 2px 2px 2px;
+    color: white;
+    cursor: pointer;
+    font-size: 8px;
+    margin-left: 5px;
+    padding: 2px;
+}
+#search {
+    outline: medium none;
 }

@@ -14,7 +14,9 @@ and open the template in the editor.
          <script type="text/javascript" src="jquery.ontologybrowser.js"></script>
          <script>
              $(function(){
-                 $("table#table1 th").ontologyBrowser();
+                 $("table#table1 th").ontologyBrowser(function(termId){
+                     console.log(termId);
+                 });
                 // console.log($.ontologyBrowser.buildOntologyTree)
              });
          </script>
