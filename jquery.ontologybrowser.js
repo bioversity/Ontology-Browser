@@ -193,14 +193,13 @@ function makeLi(obj, last) {
         if(obj.ontology_id) hitarea.addClass("ontology-hitarea");
 
         li.append(hitarea);
-    }
+    } 
+    else 
+        li.addClass("leaf");
+    
     if(last && (has_children)) {
         li.addClass("lastExpandable");
         hitarea.addClass("lastExpandable-hitarea");
-    }
-    
-     if(last && (!has_children)) {
-        li.addClass("leaf");
     }
  
     var link = $('<a title="'+summary+'" class="minibutton btn-watch"><span id="'+id+'">'+name+'</span></a>');
