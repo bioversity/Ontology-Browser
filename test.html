@@ -13,21 +13,29 @@ and open the template in the editor.
          <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
          <script type="text/javascript" src="jquery.ontologybrowser.js"></script>
          <script>
-             $(function(){
-                 $("table#table1 th").ontologyBrowser(function(termId){
-                     console.log(termId);
-                 });
-                // console.log($.ontologyBrowser.buildOntologyTree)
-             });
+             function test(id){
+                 console.log(id)
+                $(function(){
+                    $("table#table1 th").ontologyBrowser(function(termId, termName){
+                        document.getElementById(id+1).innerHTML=termName;
+                    });
+                    // console.log($.ontologyBrowser.buildOntologyTree)
+                });
+             }
          </script>
   
     </head>
     <body>
         <table id="table1">
             <thead>
-            <th>Donor Name</th>
-            <th>Donor Institute Code</th>
-            <th>Donor Null</th>
+                <th id="c1" onmouseover="test(id);">Donor Name</th>
+                <th id="c2" onmouseover="test(id);">Donor Institute Code</th>
+                <th id="c3" onmouseover="test(id);">Donor null</th>
+            </thead>
+            <thead>
+                <th id="c11" onmouseover="test(id);"></th>
+                <th id="c21" onmouseover="test(id);"></th>
+                <th id="c31" onmouseover="test(id);"></th>
             </thead>
             <tbody>
                 <tr>

@@ -114,14 +114,15 @@ function Plugin( element) {
  */
 function openDialog($elem) {
     var exclude = $elem['context'].textContent;
-    if (oneTime.indexOf(exclude)==-1){
+    if (oneTime.indexOf(exclude)==-1 || !document.getElementsByClassName('tip_form').length){
         $elem.poshytip({
             className: 'tip_form',
             showTimeout: 1,
+            showOn: 'none',
             alignTo: 'target',
             alignX: 'center',
             offsetY: 5,
-            allowTipHover: true,
+            allowTipHover: false,
             fade: false,
             slide: false,
             content: function(updateCallback) {
@@ -214,7 +215,8 @@ function makeLi(obj, last) {
         selectArea.attr('onMouseOver','document.getElementById("'+idc+'").className="minibutton choosing"');
         selectArea.attr('onMouseOut','document.getElementById("'+idc+'").className="minibutton btn-watch"');
         selectArea.click(function(){
-            onClick(id);
+            onClick(id, name);
+            closeDialog();
         });
         li.append(selectArea)
         li.addClass("leaf");
@@ -246,12 +248,22 @@ function makeLi(obj, last) {
  
     return li;
 }
+
+function closeDialog(){
+    document.body.removeChild(document.getElementsByClassName('tip_form')[0]);
+}
     /*
      * @input: arr -> build the tree from the list of term
      * @return: the tree html
      */
 function buildOntologyTree(searchResult ,updateCallback){
         var $html = $("<div></div>");
+        var close = $("<div class='close'>close X</div>");
+        close.click(function(){
+            closeDialog();
+        });
+        $html.append(close);
+        $html.append($('<div><input type="text" tabindex="0" placeholder="Search" name="q" id="search" autocomplete="off" class="ac_input"></div>'));
         for (var i=0; i<searchResult.length; i++){ // for each search result
             var term = searchResult[i];            
             $.getJSON(CROPONTOLOGY_URL + "/get-term-parents/" +term.id + "?callback=?", function(data) { 
@@ -299,7 +311,12 @@ function listOntologies(updateCallback){
       //  return $.getJSON("http://www.cropontology.org/get-ontologies?callback=?", listOntologiesCallback);
         var $html = $("<div></div>");
         // search 
-        $html.append($('<div><input type="text" tabindex="0" placeholder="Search" name="q" id="search" autocomplete="off" class="ac_input"></div>'))
+        var close = $("<div class='close'>close X</div>");
+        close.click(function(){
+            closeDialog();
+        });
+        $html.append(close);
+        $html.append($('<div><input type="text" tabindex="0" placeholder="Search" name="q" id="search" autocomplete="off" class="ac_input"></div>'));
         $.getJSON("http://www.cropontology.org/get-ontologies?callback=?", function(data) {
             var $root = $("<ul class='treeview'></ul>");
             var obj = JSON.stringify(data, function(key, value){

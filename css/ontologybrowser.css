@@ -167,19 +167,38 @@ button.minibutton::-moz-focus-inner {
     outline: medium none;
 }
 .selection {
-    background: none repeat scroll 0 0 #4183C4;
+    background: none repeat scroll 0 0 yellow;
     border-radius: 2px 2px 2px 2px;
-    color: white;
+    color: blue;
     cursor: pointer;
-    font-size: 8px;
+    font-size: 12px;
+    font-weight:bold;
+    border: 1px solid #D4D4D4;
     margin-left: 5px;
     padding: 2px;
 }
 .choosing{
-    background: -moz-linear-gradient(center top , #599BDC, #3072B3) repeat scroll 0 0 transparent;
+    background: -moz-linear-gradient(center top , #599BDC, #3072B3) repeat scroll 0 0;
     background-color: #4183C4;
     border-color: #518CC6 #518CC6 #2A65A0;
     color: #FFFFFF;
     text-decoration: none;
     text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.3);
+}
+.close {
+    background: none repeat scroll 0 0;
+    border-radius: 2px 2px 2px 2px;
+    color: red;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight:bold;
+    border: 1px solid #D4D4D4;
+    padding: 2px;
+    position: absolute;
+    top: -1px;
+    right: 0px;
+}   
+/* fix for chrome */
+* html .choosing{
+    background-color: #4183C4;
 }
