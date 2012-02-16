@@ -160,6 +160,7 @@ function bindClick(elem){
  *
  * @returns a jquery dom element
  */
+var i = 0;
 function makeLi(obj, last) {
     // generic attributes
     if(obj.ontology_id) {
@@ -194,25 +195,35 @@ function makeLi(obj, last) {
 
         li.append(hitarea);
     } 
-    else 
-        li.addClass("leaf");
-    
+   
     if(last && (has_children)) {
         li.addClass("lastExpandable");
         hitarea.addClass("lastExpandable-hitarea");
     }
- 
-    var link = $('<a title="'+summary+'" class="minibutton btn-watch"><span id="'+id+'">'+name+'</span></a>');
+    var idc = id+"A"+i;
+    i++;
+    var link = $('<a title="'+summary+'" class="minibutton btn-watch" id="'+idc+'"><span id="'+id+'">'+name+'</span></a>');
     link.click(function(){
-        onClick(id);
+        //onClick(id);
+        console.log("return details");
     });
- 
     li.append(link);
+    
+    if (!has_children){
+        var selectArea = $('<span class="selection"><- use</span>');
+        selectArea.attr('onMouseOver','document.getElementById("'+idc+'").className="minibutton choosing"');
+        selectArea.attr('onMouseOut','document.getElementById("'+idc+'").className="minibutton btn-watch"');
+        selectArea.click(function(){
+            onClick(id);
+        });
+        li.append(selectArea)
+        li.addClass("leaf");
+    }
 
     if(relationship) {
         var rel = $("<span class='relationship "+relationship+"' title='"+relationship+"'>"+relationship+"</span>");
 
-        li.append(rel);
+     //   li.append(rel);
 
     }
  
@@ -239,7 +250,7 @@ function makeLi(obj, last) {
      * @input: arr -> build the tree from the list of term
      * @return: the tree html
      */
-function buildOntologyTree(searchResult, updateCallback){
+function buildOntologyTree(searchResult ,updateCallback){
         var $html = $("<div></div>");
         for (var i=0; i<searchResult.length; i++){ // for each search result
             var term = searchResult[i];            
@@ -380,7 +391,8 @@ function load_branch(parent, url) {
     }
     $[pluginName] = { 
        search: search,
-       buildOntologyTree: buildOntologyTree
+       buildOntologyTree: buildOntologyTree,
+       openDialog: openDialog
     }
 
 })( jQuery, window, document );

@@ -106,7 +106,7 @@ button.minibutton::-moz-focus-inner {
     line-height: 21px;
     padding: 0 9px 0 7px;
 }
-.minibutton:hover {
+.minibutton:hover{
     background: -moz-linear-gradient(center top , #599BDC, #3072B3) repeat scroll 0 0 transparent;
     background-color: #4183C4;
     border-color: #518CC6 #518CC6 #2A65A0;
@@ -165,4 +165,21 @@ button.minibutton::-moz-focus-inner {
 }
 #search {
     outline: medium none;
+}
+.selection {
+    background: none repeat scroll 0 0 #4183C4;
+    border-radius: 2px 2px 2px 2px;
+    color: white;
+    cursor: pointer;
+    font-size: 8px;
+    margin-left: 5px;
+    padding: 2px;
+}
+.choosing{
+    background: -moz-linear-gradient(center top , #599BDC, #3072B3) repeat scroll 0 0 transparent;
+    background-color: #4183C4;
+    border-color: #518CC6 #518CC6 #2A65A0;
+    color: #FFFFFF;
+    text-decoration: none;
+    text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.3);
 }
