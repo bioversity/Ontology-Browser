@@ -9,33 +9,49 @@ and open the template in the editor.
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="stylesheet" type="text/css" href="css/ontologybrowser.css">
         <link rel="stylesheet" type="text/css" href="css/jquery.treeview.css">
+        <link rel="stylesheet" type="text/css" href="css/default.css">
 
          <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
          <script type="text/javascript" src="jquery.ontologybrowser.js"></script>
+         <script type="text/javascript" src="jquery-impromptu.js"></script>
          <script>
-             function test(id){
-                 console.log(id)
-                $(function(){
-                    $("table#table1 th").ontologyBrowser(function(termId, termName){
-                        document.getElementById(id+1).innerHTML=termName;
-                    });
-                    // console.log($.ontologyBrowser.buildOntologyTree)
+            $(function(){
+                $("table#table1 th").ontologyBrowser(function(termId, termName, elemClicked){
+                    var newId = (elemClicked['context'].id.indexOf("ontology")!=-1) ? elemClicked['context'].id : elemClicked['context'].id+"ontology" ;
+                    /*var $newTr =""; 
+                    var $newHeader = $("<th id='"+newId+"'>"+termName+"</th>");
+                    if (!document.getElementById("ontology")){
+                        $newTr = $("<tr id='ontology'></tr>");
+                        $newTr.append($newHeader);
+                        $newTr.insertAfter("#user");
+                    }
+                    else {
+                        $newTr = $(document.getElementById("ontology"))
+                        if (!document.getElementById(newId))
+                            $newTr.append($newHeader);
+                        else{*/
+                            document.getElementById(newId).innerHTML=termName;
+                     //   }
+                    //}
                 });
-             }
+                // console.log($.ontologyBrowser.buildOntologyTree)
+            });
          </script>
   
     </head>
     <body>
         <table id="table1">
             <thead>
-                <th id="c1" onmouseover="test(id);">Donor Name</th>
-                <th id="c2" onmouseover="test(id);">Donor Institute Code</th>
-                <th id="c3" onmouseover="test(id);">Donor null</th>
-            </thead>
-            <thead>
-                <th id="c11" onmouseover="test(id);"></th>
-                <th id="c21" onmouseover="test(id);"></th>
-                <th id="c31" onmouseover="test(id);"></th>
+                <tr id="user">
+                    <th id="c1">Donor Name</th>
+                    <th id="c2">Donor Institute Code</th>
+                    <th id="c3">Donor null</th>
+                </tr>
+                <tr id="ontology">
+                    <th id="c1ontology"></th>
+                    <th id="c2ontology"></th>
+                    <th id="c3ontology"></th>
+                </tr>
             </thead>
             <tbody>
                 <tr>
