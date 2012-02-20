@@ -11,7 +11,7 @@ div.jqi{
 	width: 400px; 
 	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif; 
 	position: absolute; 
-	background-color: #ffffff; 
+	background-color: #F8F8F8; 
 	font-size: 11px; 
 	text-align: left; 
 	border: solid 1px #eeeeee;
@@ -20,9 +20,11 @@ div.jqi{
 	-webkit-border-radius: 10px;
 	padding: 7px;
 }
+/*
 div.jqi .jqicontainer{ 
 	font-weight: bold; 
 }
+*/
 div.jqi .jqiclose{ 
 	position: absolute;
 	top: 4px; right: -2px; 
@@ -79,3 +81,26 @@ div.jqi button.jqidefaultbutton{
 .jqi .jqiarrowrm{ right: -20px; top: 50%; border-left-color: #ffffff; margin-top: -10px; }
 .jqi .jqiarrowrb{ right: -20px; bottom: 10px; border-left-color: #ffffff; }
 
+label.details{
+    float: left;
+    font-weight: bold;
+    text-align: right;
+    width: 118px;
+} 
+span.details{
+    display: block;
+    float: left;
+    padding-left: 10px;
+    width: 250px;
+    word-wrap: break-word;
+}
+h3.attributes{
+    text-align:center;
+}
+div.attributes{
+    border-bottom: 1px solid #DDDDDD;
+    clear: both;
+    line-height: 150%;
+    overflow: hidden;
+    padding: 20px 0;
+}

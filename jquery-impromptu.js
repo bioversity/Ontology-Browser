@@ -211,7 +211,7 @@
 		prefix:'jqi',
 		classes: '',
 		buttons: {
-			Ok: true
+			//Ok: true
 		},
 	 	loaded: function(){},
 	  	submit: function(){
@@ -222,11 +222,11 @@
 	 	zIndex: 999,
 	  	overlayspeed: 'slow',
 	   	promptspeed: 'fast',
-   		show: 'fadeIn',//'promptDropIn',
+   		show: 'promptDropIn',//'fadeIn',promptDropIn
 	   	focus: 0,
 	   	useiframe: false,
 	 	top: '15%',
-	  	persistent: true,
+	  	persistent: false,
 	  	timeout: 0,
 	  	state: {
 			html: '',
@@ -305,8 +305,8 @@
 		else{
 			$.prompt.jqi.css({
 				position: "absolute",
-				top: top,
-				left: $window.width()/2,
+				top: "10%",//top
+				left: "70%",//$window.width()/2
 				marginLeft: (($.prompt.jqi.outerWidth()/2)*-1)
 			});
 		}

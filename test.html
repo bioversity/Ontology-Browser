@@ -7,8 +7,8 @@ and open the template in the editor.
     <head>
         <title></title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <link rel="stylesheet" type="text/css" href="css/ontologybrowser.css">
         <link rel="stylesheet" type="text/css" href="css/jquery.treeview.css">
+        <link rel="stylesheet" type="text/css" href="css/ontologybrowser.css">
         <link rel="stylesheet" type="text/css" href="css/default.css">
 
          <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
@@ -18,24 +18,13 @@ and open the template in the editor.
             $(function(){
                 $("table#table1 th").ontologyBrowser(function(termId, termName, elemClicked){
                     var newId = (elemClicked['context'].id.indexOf("ontology")!=-1) ? elemClicked['context'].id : elemClicked['context'].id+"ontology" ;
-                    /*var $newTr =""; 
-                    var $newHeader = $("<th id='"+newId+"'>"+termName+"</th>");
-                    if (!document.getElementById("ontology")){
-                        $newTr = $("<tr id='ontology'></tr>");
-                        $newTr.append($newHeader);
-                        $newTr.insertAfter("#user");
-                    }
-                    else {
-                        $newTr = $(document.getElementById("ontology"))
-                        if (!document.getElementById(newId))
-                            $newTr.append($newHeader);
-                        else{*/
                             document.getElementById(newId).innerHTML=termName;
-                     //   }
-                    //}
                 });
-                // console.log($.ontologyBrowser.buildOntologyTree)
             });
+            function searchForm(value){
+                $.ontologyBrowser.bindClick(value);
+            }
+
          </script>
   
     </head>

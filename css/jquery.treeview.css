@@ -37,6 +37,16 @@
 .treeview .hover { color: red; cursor: pointer; }
 
 .treeview li .leaf a { background-color: yellow; } 
+/* fix for ie */ 
+.treeview li .leaf a:hover { background-color: #4183C4; } 
+.treeview li .leaf a.choosing { 
+    background: -moz-linear-gradient(center top , #599BDC, #3072B3) repeat scroll 0 0;
+    background-color: #4183C4;
+    border-color: #518CC6 #518CC6 #2A65A0;
+    color: #FFFFFF;
+    text-decoration: none;
+    text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.3);
+} 
 
 .treeview li { background: url(../images/treeview-default-line.gif) 0 0 no-repeat; }
 .treeview li.collapsable, .treeview li.expandable { background-position: 0 -176px; }

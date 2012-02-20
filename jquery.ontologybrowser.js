@@ -113,6 +113,7 @@ function Plugin( element) {
  * @return: build the dialog calling varius function to create the tree
  */
 function openDialog($elem) {
+    console.log($elem)
     var exclude = $elem['context'].textContent;
     if (oneTime.indexOf(exclude)==-1 || !document.getElementsByClassName('tip_form').length){
         $elem.poshytip({
@@ -208,8 +209,11 @@ function makeLi(obj, last) {
     i++;
     var link = $('<a title="'+summary+'" class="minibutton btn-watch" id="'+idc+'"><span id="'+id+'">'+name+'</span></a>');
     link.click(function(){
-        //onClick(id);
-        openDetails($.getJSON(CROPONTOLOGY_URL + "/get-attributes/"+id+"?callback=?"));
+        $.getJSON(CROPONTOLOGY_URL + "/get-attributes/"+id+"?callback=?", function(data){
+            openDetails(data, id, name);
+        });
+        // close the details modal on next click
+        jQuery.prompt.close();
     });
     li.append(link);
     
@@ -218,6 +222,8 @@ function makeLi(obj, last) {
         selectArea.attr('onMouseOver','document.getElementById("'+idc+'").className="minibutton choosing"');
         selectArea.attr('onMouseOut','document.getElementById("'+idc+'").className="minibutton btn-watch"');
         selectArea.click(function(){
+            // close the details modal when click on use button
+            jQuery.prompt.close();
             onClick(id, name, $elemClicked);
             closeDialog();
         });
@@ -266,12 +272,14 @@ function buildOntologyTree(searchResult ,updateCallback){
         var close = $("<div class='close'>close X</div>");
         close.click(function(){
             closeDialog();
+            // close the details modal when click on use button
+            jQuery.prompt.close();
         });
         $html.append(close);
-        $html.append($('<div><input type="text" tabindex="0" placeholder="Search" name="q" id="search" autocomplete="off" class="ac_input"></div>'));
+        $html.append($('<div><input type="text" tabindex="0" placeholder="Search" name="q" id="search" autocomplete="off" class="ac_input" onkeypress="{if (event.keyCode==13) searchForm(value)}"></div>'));
         for (var i=0; i<searchResult.length; i++){ // for each search result
             var term = searchResult[i];            
-            $.getJSON(CROPONTOLOGY_URL + "/get-term-parents/" +term.id + "?callback=?", function(data) { 
+            $.getJSON(CROPONTOLOGY_URL + "/get-term-parents/" +term.id + "?callback=?", function(data) {
                 var $root = $("<div></div>");
                 for(var x=0; x<data.length; x++) { // for each relationship
                     var parent;
@@ -319,6 +327,8 @@ function listOntologies(updateCallback){
         var close = $("<div class='close'>close X</div>");
         close.click(function(){
             closeDialog();
+            // close the details modal when click on use button
+            jQuery.prompt.close();
         });
         $html.append(close);
         $html.append($('<div><input type="text" tabindex="0" placeholder="Search" name="q" id="search" autocomplete="off" class="ac_input"></div>'));
@@ -348,9 +358,6 @@ function listOntologies(updateCallback){
  * @return: return the id of the element clicked
  */
 function callbackOnClick(e){
- //   console.log(e);
-  //  console.log(e.target.attributes['id'].value);
-  //  console.log(e.target.textContent);
     e.preventDefault();
     e.stopPropagation();
     window.open("http://www.cropontology.org/terms/"+e.target.attributes['id'].value+"/");
@@ -367,10 +374,36 @@ function loader(parent, show){
         $(parent).prev().remove();
     }
 }
-function openDetails($attributes){
-    // $.prompt(message, options) open modal, print the message. for the options look at http://www.trentrichardson.com/Impromptu/index.php
-    $.prompt('details',{ opacity: 0 });
-    console.log($attributes);
+
+/**
+ * create the modal with the details
+ * @input: json -> the json from get-attributes
+ * @input: id -> the id of the element clicked
+ * @input: name -> the name of the element clicked
+ * 
+ * @return the modal with the details
+ */
+function openDetails(json, id, name){
+    var $details = $("<div></div>");
+    var $name = $("<h3 class='attributes'>"+name+"</h3>");
+    $details.append($name);
+    var $id= $("<div class='attributes'><label class='details'>Identifier</label><span class='details'>"+id+"</span></div>");
+    $details.append($id);
+    var obj = JSON.stringify(json, function(key, value){
+                if (typeof value==='object')
+                    $.each(value, function(i,arr){
+                        var $attr = $("<div class='attributes'></div>");
+                        var $label = $("<label class='details'>"+arr.key+"</label>");
+                        $attr.append($label);
+                        var $span = $("<span class='details'>"+arr.value+"</span>");
+                        $attr.append($span);
+                        $details.append($attr);
+                    });
+                
+                });
+    // call modal
+    $.prompt($details.html(),{ opacity: 0, persistent:false });
+    
 }
 /*
  * loads a single branch given an array of objects
@@ -423,7 +456,8 @@ function load_branch(parent, url) {
     $[pluginName] = { 
        search: search,
        buildOntologyTree: buildOntologyTree,
-       openDialog: openDialog
+       openDialog: openDialog,
+       bindClick: bindClick
     }
 
 })( jQuery, window, document );
