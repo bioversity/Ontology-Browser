@@ -113,7 +113,6 @@ function Plugin( element) {
  * @return: build the dialog calling varius function to create the tree
  */
 function openDialog($elem) {
-    console.log($elem)
     var exclude = $elem['context'].textContent;
     if (oneTime.indexOf(exclude)==-1 || !document.getElementsByClassName('tip_form').length){
         $elem.poshytip({
@@ -263,6 +262,26 @@ function closeDialog(){
     //$(".tip_form").remove();
     $elemClicked.poshytip('hide');
 }
+
+/**
+ * @input par-> the parameter to search
+ * @return the ontology tree if find something, otherwise the ontologies list 
+ */
+function searchForm(par){
+    $elemClicked.poshytip('update', function(updateCallback) {
+                search(par['target'].value, function(data) { 
+                    if(!data) {
+                        listOntologies(updateCallback);
+                    } else if(data.length) {
+                        buildOntologyTree(data, updateCallback);
+                    } else {
+                        listOntologies(updateCallback);
+                    }
+                });
+                return 'Loading...';
+        });
+ }
+ 
     /**
      * @input: arr -> build the tree from the list of term
      * @return: the tree html
@@ -276,7 +295,12 @@ function buildOntologyTree(searchResult ,updateCallback){
             jQuery.prompt.close();
         });
         $html.append(close);
-        $html.append($('<div><input type="text" tabindex="0" placeholder="Search" name="q" id="search" autocomplete="off" class="ac_input" onkeypress="{if (event.keyCode==13) searchForm(value)}"></div>'));
+        var $searchForm = $('<input type="text" tabindex="0" placeholder="Search" name="q" id="search" autocomplete="off" class="ac_input" >');
+        $searchForm.bind('keypress', function(e){
+            if(e.keyCode == 13)
+                searchForm(e);
+        });
+        $html.append($searchForm);
         for (var i=0; i<searchResult.length; i++){ // for each search result
             var term = searchResult[i];            
             $.getJSON(CROPONTOLOGY_URL + "/get-term-parents/" +term.id + "?callback=?", function(data) {
@@ -331,7 +355,12 @@ function listOntologies(updateCallback){
             jQuery.prompt.close();
         });
         $html.append(close);
-        $html.append($('<div><input type="text" tabindex="0" placeholder="Search" name="q" id="search" autocomplete="off" class="ac_input"></div>'));
+        var $searchForm = $('<input type="text" tabindex="0" placeholder="Search" name="q" id="search" autocomplete="off" class="ac_input" >');
+        $searchForm.bind('keypress', function(e){
+            if(e.keyCode == 13)
+                searchForm(e);
+        });
+        $html.append($searchForm);
         $.getJSON("http://www.cropontology.org/get-ontologies?callback=?", function(data) {
             var $root = $("<ul class='treeview'></ul>");
             var obj = JSON.stringify(data, function(key, value){
@@ -402,7 +431,7 @@ function openDetails(json, id, name){
                 
                 });
     // call modal
-    $.prompt($details.html(),{ opacity: 0, persistent:false });
+    $.prompt($details.html(),{opacity: 0, persistent:false});
     
 }
 /*
@@ -444,7 +473,7 @@ function load_branch(parent, url) {
     // A really lightweight plugin wrapper around the constructor, 
     // preventing against multiple instantiations
     $.fn[pluginName] = function (cb) { 
-        $(this.selector).live("click", function() { bindClick(this); })
+        $(this.selector).live("click", function() {bindClick(this);})
         onClick = cb;
         $domSelector = this;
         return this.each(function () {
