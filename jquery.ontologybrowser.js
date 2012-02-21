@@ -120,7 +120,7 @@ function openDialog($elem) {
             showTimeout: 1,
             showOn: 'none',
             alignTo: 'target',
-            alignX: 'center',
+            alignX: 'inner-left',
             offsetY: 5,
             allowTipHover: true,
             fade: false,

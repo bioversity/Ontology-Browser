@@ -1,0 +1,36 @@
+#container { 
+	width:990px;
+	/*max-width: 80em; */
+	/*background: #FFFFFF url(../images/left-col2.png)repeat-y -0.1em;*/
+	background:#fff;
+	margin: 0 auto; 
+	border: 1px solid #000000;
+	text-align: left; 
+} 
+
+#header {
+    background: url("../images/banner.png");
+    height: 120px;
+    border: 1px solid #000000;
+}
+
+#operations {
+    height: 600px;
+    width: 150px;
+    border: 1px solid #000000;
+    padding-top: 1.3em;
+    position: relative;
+}
+#operations p{
+    position: relative;
+    left: 10px;
+}
+
+#working_area {
+    border: 1px solid #000000;
+    height: 620px;
+    margin-left: 150px;
+    margin-top: -623px;
+    padding-left: 1.3em;
+    width: auto;
+}
