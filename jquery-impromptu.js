@@ -127,7 +127,7 @@
 					top = parseInt($.prompt.jqi.css('top').replace('px',''),10) - offset;
 
 				//$window.scrollTop(top);
-				$('html,body').animate({ scrollTop: top }, 'fast', function(){
+				$('html,body').animate({scrollTop: top}, 'fast', function(){
 					var i = 0;
 					$.prompt.jqib.addClass($.prompt.options.prefix +'warning');
 					var intervalid = setInterval(function(){
@@ -206,7 +206,7 @@
 
 		return $.prompt.jqib;
 	};
-	
+
 	$.prompt.defaults = {
 		prefix:'jqi',
 		classes: '',
@@ -225,7 +225,7 @@
    		show: 'promptDropIn',//'fadeIn',promptDropIn
 	   	focus: 0,
 	   	useiframe: false,
-	 	top: '15%',
+	 	top: '13%',
 	  	persistent: false,
 	  	timeout: 0,
 	  	state: {
@@ -266,7 +266,7 @@
 			height = bodyHeight > windowHeight ? bodyHeight : windowHeight,
 			top = parseInt($window.scrollTop(),10) + ($.prompt.options.top.toString().indexOf('%') >= 0? (windowHeight*(parseInt($.prompt.options.top,10)/100)) : parseInt($.prompt.options.top,10));
 		height = height > documentHeight? height : documentHeight;
-		
+                
 		$.prompt.jqib.css({
 			position: "absolute",
 			height: height,
@@ -285,7 +285,7 @@
 			right: 0,
 			bottom: 0
 		});
-		
+		                
 		if($.prompt.states[$.prompt.currentStateName].position.container !== null){
 			var pos = $.prompt.states[$.prompt.currentStateName].position,
 				offset = $(pos.container).offset();
@@ -300,19 +300,24 @@
 				width: (pos.width !== undefined)? pos.width : null
 			});
 			top = (offset.top + pos.y) - ($.prompt.options.top.toString().indexOf('%') >= 0? (windowHeight*(parseInt($.prompt.options.top,10)/100)) : parseInt($.prompt.options.top,10));
-			$('html,body').animate({ scrollTop: top }, 'slow', 'swing', function(){});
+			$('html,body').animate({scrollTop: top}, 'slow', 'swing', function(){});
 		}
 		else{
-			$.prompt.jqi.css({
+                    // alling to poshytip element
+                    var $poshytip = $(document.getElementsByClassName('tip_form')[0])
+                    var offset = $poshytip.offset();
+                    var leftPos = (offset.left<$window.width()/2) ? offset.left+600 : offset.left-200;
+                    var topPos = offset.top;
+                    		$.prompt.jqi.css({
 				position: "absolute",
-				top: "13%",//top,
-				left: "80%",//$window.width()/2
+				top: topPos,//top
+				left: leftPos,//"70%",//$window.width()/2
 				marginLeft: (($.prompt.jqi.outerWidth()/2)*-1)
 			});
 		}
 		
 	};
-	
+        
 	$.prompt.style = function(){
 		$.prompt.jqif.css({
 			zIndex: $.prompt.options.zIndex,
@@ -388,7 +393,7 @@
 			
 			if($t.css("display") == "none"){ 
 				var eltop = $t.css('top');
-				$t.css({ top: $(window).scrollTop(), display: 'block' }).animate({ top: eltop },speed,'swing',callback); 
+				$t.css({top: $(window).scrollTop(), display: 'block'}).animate({top: eltop},speed,'swing',callback); 
 			}
 		}
 		

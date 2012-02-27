@@ -8,7 +8,7 @@
 	background-color: #777777; 
 }
 div.jqi{ 
-	width: 400px; 
+	width: 300px; 
 	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif; 
 	position: absolute; 
 	background-color: #F8F8F8; 
@@ -19,6 +19,8 @@ div.jqi{
 	-moz-border-radius: 10px;
 	-webkit-border-radius: 10px;
 	padding: 7px;
+    overflow: auto;
+    max-height: 400px;
 }
 /*
 div.jqi .jqicontainer{ 
@@ -27,7 +29,8 @@ div.jqi .jqicontainer{
 */
 div.jqi .jqiclose{ 
 	position: absolute;
-	top: 4px; right: -2px; 
+	top: 4px; 
+    right: 0px; 
 	width: 18px; 
 	cursor: default; 
 	color: #bbbbbb; 
@@ -84,14 +87,13 @@ div.jqi button.jqidefaultbutton{
 label.details{
     float: left;
     font-weight: bold;
-    text-align: right;
-    width: 118px;
+    text-align: left;
+    width: 80px;
 } 
 span.details{
     display: block;
     float: left;
-    padding-left: 10px;
-    width: 250px;
+    width: 150px;
     word-wrap: break-word;
 }
 h3.attributes{

@@ -129,7 +129,8 @@ function openDialog($elem) {
                 search($elem.text(), function(data) { 
                     var content = "";
                     if(!data) {
-                        updateCallback("Error : Access to restricted URI denied");
+                        listOntologies(updateCallback);
+                        //updateCallback("Error : Access to restricted URI denied");
                     } else if(data.length) {
                         buildOntologyTree(data, updateCallback);
                     } else {
@@ -152,6 +153,8 @@ function search(text, callback) {
 }
 
 function bindClick(elem){
+    if(document.getElementsByClassName("tip_form")[0])
+        closeDialog();
     $elemClicked = $(elem);
     var $el = $(elem);
     openDialog($el);

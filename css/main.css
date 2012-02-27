@@ -28,9 +28,20 @@
 
 #working_area {
     border: 1px solid #000000;
-    height: 620px;
+    height: 600px;
     margin-left: 150px;
     margin-top: -623px;
-    padding-left: 1.3em;
+    padding-left: 3px;
+    padding-top: 1.3em;
     width: auto;
+    overflow: auto;
+}
+.selected{
+    background-color: yellow;
+}
+.notSelected{
+    background-color: white;
+}
+th{
+    cursor: pointer;
 }
