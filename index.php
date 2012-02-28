@@ -48,6 +48,7 @@ and open the template in the editor.
                     }
                     return xmlHttp;
                 }
+;
                 function MakeRequest(value, getValue) {
                     var xmlHttp = getXMLHttp();
                     xmlHttp.onreadystatechange = function() {
@@ -106,10 +107,7 @@ and open the template in the editor.
                 <?php
                     if(isset($_FILES) && !empty($_FILES)){
                         include 'upload_file.php';
-                        if($print)
-                            echo $print;    
-                        else
-                            echo "<script>window.onload=MakeRequest('import','fileExist=".$_FILES["file"]["name"]."');</script>";
+                        echo $print;    
                     }
                     else 
                         echo "<script>window.onload=MakeRequest('home');</script>";
