@@ -1,19 +1,5 @@
 <?php
-/*    echo"<pre>";
-    print_r($_FILES);
-    echo "</pre>";
-    if ($_FILES["file"]["error"] > 0){
-        echo "Error: " . $_FILES["file"]["error"] . "<br />";
-    }
-    else{
-        echo "Upload: " . $_FILES["file"]["name"] . "<br />";
-        echo "Type: " . $_FILES["file"]["type"] . "<br />";
-        echo "Size: " . ($_FILES["file"]["size"] / 1024) . " Kb<br />";
-        echo "Stored in: " . $_FILES["file"]["tmp_name"];
-    }
-    echo "<br>";
-  */ 
-
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     switch ($_FILES["file"]["type"] ) {
         case "application/vnd.ms-excel": // excel
             echo readXLS();
@@ -21,21 +7,20 @@
         case "text/csv": // csv
             $print = readCSV($_FILES["file"]["tmp_name"], $_FILES["file"]["name"]);
             break;
+        default :
+            $print = 'file not accepted';
     }
- 
+}
     function readXLS(){
         return "xls";
     }
     
     function readCSV($location, $file){
         if (file_exists("upload/" . $file)){
-            unlink("upload/".$file);
-            move_uploaded_file($location, "upload/" . $file);
-           // return ( $file . " already exists. ");
+            return false;
         }
         else{
             move_uploaded_file($location, "upload/" . $file);
-            //echo "Stored in: " . "upload/" . $file;
         } 
         
         require_once "File_CSV/File_CSV/DataSource.php";
@@ -72,6 +57,7 @@
             $i++;
         }
         $return .= "</tbody></table>";
+        $return .= '<br><br><input type=\'submit\' name=\'submit\' value=\'Submit\' onclick=validation(\'upload/'.$file.'\'); />';
         ini_set("auto_detect_line_endings", $old);
         //rename("upload/".$file, "upload/".$file.".old");
         return $return;

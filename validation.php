@@ -1,4 +1,7 @@
 <?php
+ echo "<pre>";print_r($_FILES);echo"</pre>";
+ //   rename("upload/".$_FILES['file']['name'], "upload/".$_FILES['file']['name'].".old");
+  //  unlink("upload/".$_FILES['file']['name']);
 
     echo "<pre>";print_r($_GET);echo"</pre>";
     $row = 1;
