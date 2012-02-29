@@ -17,9 +17,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
     function readCSV($location, $file){
         if (file_exists("upload/" . $file)){
-            return "<script>window.onload=MakeRequest('import','fileExist=".$_FILES["file"]["name"]."');</script>";
+            move_uploaded_file($location, "upload/" . $file);
+        //    return "<script>window.onload=MakeRequest('import','fileExist=".$_FILES["file"]["name"]."');</script>";
         }
-        else{
+        else
             move_uploaded_file($location, "upload/" . $file);
         
             require_once "File_CSV/File_CSV/DataSource.php";
@@ -32,13 +33,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $header = $csv -> getHeaders();
             $i=1;
             foreach ($header AS $value){
-                $return .= "<th id='C".$i."' class='C".$i." notSelected' onclick='changeColumn(id);'>".htmlspecialchars($value)."</th>";
+                $return .= "<th id='C".$i."' class='C".$i." notSelected' >".htmlspecialchars($value)."</th>";
                 $i++;
             }
             $return .= "</tr><tr id='ontology'>";
             $i=1;
             foreach ($header AS $value){
-                $return .= "<th id='C".$i."ontology' class='C".$i." notSelected' onclick='changeColumn(id);'></th>";
+                $return .= "<td id='C".$i."ontology' class='C".$i." notSelected' ></td>";
                 $i++;
             }
             $return .= "</tr></thead><tbody>";
@@ -60,6 +61,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             ini_set("auto_detect_line_endings", $old);
             //rename("upload/".$file, "upload/".$file.".old");
             return $return;
-        }
+        
     }
 ?>

@@ -1,0 +1,81 @@
+10
+
+dir
+52
+svn://beauscott.com/widgets/HelpBalloons
+svn://beauscott.com
+
+
+
+2008-06-13T06:45:35.830469Z
+52
+beau6183
+has-props
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+4c8f6fa0-3a3c-0410-88a0-c2639e18b265
+
+HelpBalloon.psd
+file
+
+
+
+
+2007-06-03T14:25:16.000000Z
+893caceb5b323ba77f06cf76df117ade
+2008-01-29T04:53:52.219997Z
+17
+beau6183
+has-props
+
+LICENSE
+file
+
+
+
+delete
+2008-01-29T05:52:26.000000Z
+603d80bc9cdd43b0c937491a88fe0987
+2008-01-29T04:53:52.219997Z
+17
+beau6183
+
+doc
+dir
+
+
+
+delete
+
+images
+dir
+
+index.php
+file
+
+
+
+delete
+2008-06-13T06:46:44.000000Z
+3869d96e56df4a4c8d11654529215cde
+2008-03-25T01:20:48.865707Z
+36
+beau6183
+
+lib
+dir
+
+src
+dir
+

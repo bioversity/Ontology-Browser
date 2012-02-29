@@ -11,15 +11,22 @@ and open the template in the editor.
         <link rel="stylesheet" type="text/css" href="css/jquery.treeview.css">
         <link rel="stylesheet" type="text/css" href="css/ontologybrowser.css">
         <link rel="stylesheet" type="text/css" href="css/details.css">
-
+      
          <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
          <script type="text/javascript" src="jquery.ontologybrowser.js"></script>
          <script type="text/javascript" src="jquery-impromptu.js"></script>
+         <!-- tooltip javascript import -->
+         <script type="text/javascript" src="glt.js"></script>
          <script>
+             
+            var CROPONTOLOGY_URL = "http://www.cropontology.org"; 
+             
             $(function(){
                 $("table#table1 th").ontologyBrowser(function(termId, termName, elemClicked){
-                    var newId = (elemClicked['context'].id.indexOf("ontology")!=-1) ? elemClicked['context'].id : elemClicked['context'].id+"ontology" ;
+                    var elemClickedId = elemClicked['context'].id;
+                    var newId = elemClicked['context'].id+"ontology" ;
                     document.getElementById(newId).innerHTML=termName+" ["+termId+"]";
+                    changeColumn(elemClickedId, true);
  //                   var newLocation = (window.location.href.indexOf("?")==-1) ? window.location.href+"?"+termId+"="+termName : window.location.href+"&"+termId+"="+termName ; 
  //                   window.location.href = newLocation;
                 });
@@ -66,11 +73,12 @@ and open the template in the editor.
                 document.getElementById('working_area').innerHTML = response;
             }
             
-            function changeColumn(id){
-                var old = document.getElementsByClassName("selected");
-                $(old).removeClass("selected").addClass("notSelected");
-                var column = document.getElementsByClassName(id);
-                $(column).addClass("selected").removeClass("notSelected");
+            function changeColumn(className, selected){
+                var column = document.getElementsByClassName(className);
+                if (selected)
+                    $(column).addClass("unique").removeClass("notSelected");
+                else
+                    $(column).addClass("selected").removeClass("notSelected");
             }
             
             function validation(file){
@@ -88,6 +96,37 @@ and open the template in the editor.
                 if(i==$onto.length)
                     MakeRequest("validation", getValue)
             }
+         
+            $(function(){
+                var table =$("table#table1 th");
+                var j = 0;
+                $("table#table1 th").each(function(){
+                    document.getElementById('working_area').style.opacity='0.4';
+                    document.getElementById('loading').style.visibility='visible';
+                    var currentId = $(this).attr('id');
+                    var $currentElement = $(this);
+                        var currentValue = $(this).text();
+                        $.getJSON(CROPONTOLOGY_URL + "/search?callback=?&q=" + currentValue, function(data){ 
+                            if (data.length==1){
+                                changeColumn(currentId, false);
+                                $currentElement.attr('title', data[0].name+" [" + data[0].id + "]");
+                                document.getElementById(currentId+"ontology").innerHTML = data[0].name+" ["+data[0].id+"]";
+                            }
+                            if (data.length > 1){
+                                var title = "";
+                                for(var i=0; i<data.length; i++)
+                                    title += data[i].name+" [" + data[i].id +"]<br>";
+                                $currentElement.attr('title', title);
+                                document.getElementById(currentId+"ontology").innerHTML = data.length+' ontologies';
+                            }
+                            j++;    
+                            if (j==table.length){
+                                document.getElementById('working_area').style.opacity='1';
+                                document.getElementById('loading').style.visibility='hidden';
+                            }
+                        })
+                });  
+            });
          </script>
 
     </head>
@@ -102,16 +141,19 @@ and open the template in the editor.
                 <p><a href="#" >2. Validation</a></p>
                 <p><a href="#" style="color:red">Logout</a></p>
             </div>
-          
+            
+            
             <div id='working_area'>
                 <?php
                     if(isset($_FILES) && !empty($_FILES)){
                         include 'upload_file.php';
                         echo $print;    
                     }
-                    else 
-                        echo "<script>window.onload=MakeRequest('home');</script>";
+                   // else 
+                  //      echo "<script>window.onload=MakeRequest('home');</script>";
                 ?>
+                
             </div>
+            <div id='loading' style="visibility: hidden"></div>
     </body>
 </html>

@@ -36,12 +36,50 @@
     width: auto;
     overflow: auto;
 }
+#loading {
+    border: 1px solid #000000;
+    height: 600px;
+    margin-left: 150px;
+    margin-top: -623px;
+    padding-left: 3px;
+    padding-top: 1.3em;
+    width: auto;
+    overflow: auto;
+    background: url('../images/loading.gif') no-repeat 30% 30%;
+}
 .selected{
-    background-color: yellow;
+    background-color: #FFFFC4;
+}
+.unique{
+    background-color: #E3FFD7;
 }
 .notSelected{
     background-color: white;
 }
 th{
     cursor: pointer;
+}
+#ontology{
+    color: red;
+    font-size: 14px;
+}
+
+.glt-elm{
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 150px;
+	color: #fff;
+	opacity: 0.9;
+	visibility: hidden;
+}
+
+.glt-elm p{
+	background: #666;
+	margin: 0;
+	padding: 0.5em;
+}
+
+.glt-elm img{
+	display: block;
 }

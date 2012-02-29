@@ -121,7 +121,7 @@ function openDialog($elem) {
             showOn: 'none',
             alignTo: 'target',
             alignX: 'inner-left',
-            offsetY: 5,
+            offsetY: 0,
             allowTipHover: true,
             fade: false,
             slide: false,
@@ -146,6 +146,8 @@ function openDialog($elem) {
 }       
     
 function search(text, callback) {
+    if(text.indexOf("[")!=-1)
+        text = text.substring(0, text.indexOf(" ["))
     $.getJSON(CROPONTOLOGY_URL + "/search?callback=?&q=" + text, callback)
         .error(function(){ 
             callback(false);  

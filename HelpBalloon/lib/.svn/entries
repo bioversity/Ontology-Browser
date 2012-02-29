@@ -1,0 +1,22 @@
+8
+
+dir
+52
+svn://beauscott.com/widgets/HelpBalloons/lib
+svn://beauscott.com
+
+
+
+2008-03-03T06:01:44.951614Z
+33
+beau6183
+
+
+svn:special svn:externals svn:needs-lock
+
+scriptaculous
+dir
+
+prototype
+dir
+
