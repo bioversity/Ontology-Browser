@@ -85,7 +85,7 @@ and open the template in the editor.
                 var getValue="file="+file;
                 var $onto= $(document.getElementById('ontology')).children();
                 for(var i=0; i<$onto.length; i++){
-                    if($($onto[i]).text()==""){
+                    if($($onto[i]).text().indexOf('[')==-1){
                         alert('select all fields');
                         break;
                     }
@@ -96,7 +96,7 @@ and open the template in the editor.
                 if(i==$onto.length)
                     MakeRequest("validation", getValue)
             }
-         
+         // show how many ontologies find for all headers
             $(function(){
                 var table =$("table#table1 th");
                 var j = 0;

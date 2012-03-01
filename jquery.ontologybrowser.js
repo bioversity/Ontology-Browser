@@ -132,7 +132,7 @@ function openDialog($elem) {
                         listOntologies(updateCallback);
                         //updateCallback("Error : Access to restricted URI denied");
                     } else if(data.length) {
-                        buildOntologyTree(data, updateCallback);
+                        buildOntologyTree(data, $elem.text(), updateCallback);
                     } else {
                         listOntologies(updateCallback);
                     }
@@ -190,7 +190,7 @@ function makeLi(obj, last) {
         hitarea;
         //has_method = (!obj.has_children && obj.method && obj.method !== "null");
 
-    var li = $("<li></li>");
+    var li = $("<li id='"+id+"li'></li>");
     if(last)
         li.addClass("last");
  
@@ -222,6 +222,7 @@ function makeLi(obj, last) {
     li.append(link);
     
     if (!has_children){
+//    if(relationship=='is_a'){
         var selectArea = $('<span class="selection"><- use</span>');
         selectArea.attr('onMouseOver','document.getElementById("'+idc+'").className="minibutton choosing"');
         selectArea.attr('onMouseOut','document.getElementById("'+idc+'").className="minibutton btn-watch"');
@@ -258,7 +259,6 @@ function makeLi(obj, last) {
 //    if(has_method) { 
    //     li.append(methodScale(obj));
    // }
- 
     return li;
 }
 
@@ -275,10 +275,8 @@ function closeDialog(){
 function searchForm(par){
     $elemClicked.poshytip('update', function(updateCallback) {
                 search(par['target'].value, function(data) { 
-                    if(!data) {
-                        listOntologies(updateCallback);
-                    } else if(data.length) {
-                        buildOntologyTree(data, updateCallback);
+                if(data.length) {
+                        buildOntologyTree(data, par['target'].value, updateCallback);
                     } else {
                         listOntologies(updateCallback);
                     }
@@ -291,7 +289,7 @@ function searchForm(par){
      * @input: arr -> build the tree from the list of term
      * @return: the tree html
      */
-function buildOntologyTree(searchResult ,updateCallback){
+function buildOntologyTree(searchResult, searchValue, updateCallback){
         var $html = $("<div></div>");
         var close = $("<div class='close'>close X</div>");
         close.click(function(){
@@ -300,14 +298,14 @@ function buildOntologyTree(searchResult ,updateCallback){
             jQuery.prompt.close();
         });
         $html.append(close);
-        var $searchForm = $('<input type="text" tabindex="0" placeholder="Search" name="q" id="search" autocomplete="off" class="ac_input" >');
+        var $searchForm = $('<input type="text" tabindex="0" placeholder="'+searchValue+'" name="q" id="search" autocomplete="off" class="ac_input" >');
         $searchForm.bind('keypress', function(e){
             if(e.keyCode == 13)
                 searchForm(e);
         });
         $html.append($searchForm);
         for (var i=0; i<searchResult.length; i++){ // for each search result
-            var term = searchResult[i];            
+            var term = searchResult[i];
             $.getJSON(CROPONTOLOGY_URL + "/get-term-parents/" +term.id + "?callback=?", function(data) {
                 var $root = $("<div></div>");
                 for(var x=0; x<data.length; x++) { // for each relationship
@@ -335,10 +333,10 @@ function buildOntologyTree(searchResult ,updateCallback){
                         parent.append(li);
                         // parent becomes the first ul inside this li
                         parent = li.find("ul:first");
-                        parent.show();                     
-                    }   
+                        parent.show();   
+                    }  
                 }
-                
+
                 $html.append($root)
                 updateCallback($html);
             });
