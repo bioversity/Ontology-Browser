@@ -314,20 +314,28 @@ function buildOntologyTree(searchResult, searchValue, updateCallback){
                     for(var i=0; i<data[x].length; i++) { // from parent to child
                         var el = data[x][i];
                         el.has_children = true;
+
+// deleting this you are supposing that the element you look for is NOT the last element
                         if(i == (data[x].length-1))
                             el.has_children = false;
                         var elemId = el.id.replace(":","");
                         if (i == 0 && !$root.hasClass(elemId)) {
                             $root.attr('class', "treeview "+elemId);
-                            parent = $root;
+                            if ($("."+elemId).length) {
+                                $root =  $("."+elemId).append($("<ul></ul>")); 
+                                parent = $root.find("ul:first");
+                                continue; 
+                            }
+                            else
+                                parent = $root;
                         }
                         else if(i == 0 && $root.hasClass(elemId)) {
-                            parent = $root.find("ul:first");;
+                            parent = $root.find("ul:first");
                             continue;                         
                         } 
-                        if (i==1 && el.has_children && x!=data.length-1)
+                        if (i==1 && el.has_children && x!=(data.length-1))
                             li = makeLi(el, false);
-                        else
+                        else 
                             li = makeLi(el, true);
                         // if(!parent.hasClass(elemId))
                         parent.append(li);

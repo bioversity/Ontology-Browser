@@ -117,7 +117,7 @@ and open the template in the editor.
                                 for(var i=0; i<data.length; i++)
                                     title += data[i].name+" [" + data[i].id +"]<br>";
                                 $currentElement.attr('title', title);
-                                document.getElementById(currentId+"ontology").innerHTML = data.length+' ontologies';
+                                document.getElementById(currentId+"ontology").innerHTML = data.length+' different terms';
                             }
                             j++;    
                             if (j==table.length){
