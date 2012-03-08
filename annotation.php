@@ -83,8 +83,8 @@ and open the template in the editor.
             
             function validation(dir){
                 var getValue="?doAnnotation="+dir;
-                
-                        window.location = "annotation.php"+getValue;
+                loading();
+                window.location = "annotation.php"+getValue;
             }
          // show how many ontologies find for all headers
             function annotation(){
@@ -94,6 +94,7 @@ and open the template in the editor.
                     $("table#table1 th").each(function(){
                         document.getElementById('working_area').style.opacity='0.4';
                         document.getElementById('loading').style.visibility='visible';
+                        document.getElementById('submit').style.visibility='hidden';
                         var currentId = $(this).attr('id');
                         var $currentElement = $(this);
                             var currentValue = $(this).text();
@@ -114,12 +115,17 @@ and open the template in the editor.
                                 if (j==table.length){
                                     document.getElementById('working_area').style.opacity='1';
                                     document.getElementById('loading').style.visibility='hidden';
+                                    document.getElementById('submit').style.visibility='visible';
                                 }
                             })
                     });  
                 });
             }
-         
+            
+            function loading(){
+                document.getElementById('working_area').style.opacity='0.4';
+                document.getElementById('loading').style.visibility='visible';
+             }
          </script>
 
     </head>
