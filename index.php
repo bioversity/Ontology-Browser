@@ -25,7 +25,7 @@ and open the template in the editor.
                 $("table#table1 th").ontologyBrowser(function(termId, termName, elemClicked){
                     var elemClickedId = elemClicked['context'].id;
                     var newId = elemClicked['context'].id+"ontology" ;
-                    document.getElementById(newId).innerHTML=termName+" ["+termId+"]";
+                    document.getElementById(newId).innerHTML=termName+" ["+termId+"]"; // put the id between [ ]
                     changeColumn(elemClickedId, true);
  //                   var newLocation = (window.location.href.indexOf("?")==-1) ? window.location.href+"?"+termId+"="+termName : window.location.href+"&"+termId+"="+termName ; 
  //                   window.location.href = newLocation;
@@ -55,19 +55,19 @@ and open the template in the editor.
                     }
                     return xmlHttp;
                 }
-;
-                function MakeRequest(value, getValue) {
-                    var xmlHttp = getXMLHttp();
-                    xmlHttp.onreadystatechange = function() {
-                        if(xmlHttp.readyState == 4) {
-                            HandleResponse(xmlHttp.responseText);
-                        }
+
+            function MakeRequest(value, getValue) {
+                var xmlHttp = getXMLHttp();
+                xmlHttp.onreadystatechange = function() {
+                    if(xmlHttp.readyState == 4) {
+                        HandleResponse(xmlHttp.responseText);
                     }
-                    if (getValue)
-                        xmlHttp.open("GET", value+".php?"+getValue, true);
-                    else
-                        xmlHttp.open("GET", value+".php", true);
-                    xmlHttp.send(null);
+                }
+                if (getValue)
+                    xmlHttp.open("GET", value+".php?"+getValue, true);
+                else
+                    xmlHttp.open("GET", value+".php", true);
+                xmlHttp.send(null);
             }
             function HandleResponse(response) {
                 document.getElementById('working_area').innerHTML = response;
@@ -85,7 +85,7 @@ and open the template in the editor.
                 var getValue="file="+file;
                 var $onto= $(document.getElementById('ontology')).children();
                 for(var i=0; i<$onto.length; i++){
-                    if($($onto[i]).text().indexOf('[')==-1){
+                    if($($onto[i]).text().indexOf('[')==-1){            // check if present a [ that should be container of id
                         alert('select all fields');
                         break;
                     }
@@ -134,24 +134,33 @@ and open the template in the editor.
         <div id="container">
             <div id='header'></div>
 
-            <div id='operations'>
-                <p><a href="#" onclick='MakeRequest("home")'>Home Page</a></p>                
-                <p><a href="#" onclick='MakeRequest("user");'>User Profile</a></p>
-                <p><a href="#" onclick='MakeRequest("import");'>1. Import file</a></p>
+            <div id='operations'>            
+                <p><a href="user.php">User Profile</a></p>
+                <p><a href="import.php">1. Import file</a></p>
                 <p><a href="#" >2. Validation</a></p>
                 <p><a href="#" style="color:red">Logout</a></p>
             </div>
             
             
             <div id='working_area'>
-                <?php
-                    if(isset($_FILES) && !empty($_FILES)){
-                        include 'upload_file.php';
-                        echo $print;    
-                    }
-                   // else 
-                  //      echo "<script>window.onload=MakeRequest('home');</script>";
-                ?>
+                <form action="access.php" method="post" enctype="multipart/form-data">
+                    <table align="left" width="100%" height="100%">
+                        <tr height="25px"></tr>
+                        <tr>
+                        <td width="150">Username:</td>
+                    <td><input type="text" name="username" size="30" /></td>
+                    </tr>
+                    <tr>
+                        <td width="150">Password:</td>
+                        <td><input type="password" name="password" size="30" /></td>
+                    </tr>
+                    <td  align='right'> 
+                        <p>
+                        <input type='submit' value='Submit'/>
+                        </p></td>
+                    </tr>
+                    </table>
+                </form>
                 
             </div>
             <div id='loading' style="visibility: hidden"></div>

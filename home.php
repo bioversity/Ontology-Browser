@@ -1,25 +1,23 @@
+<?php
+    if ($_GET['access'] != null)
+        echo '<p> access denied<p>';
+?>
 
-<table id="table1">
-                    <thead>
-                        <tr id="user">
-                            <th id="c1">Donor Name</th>
-                            <th id="c2">Donor Institute Code</th>
-                            <th id="c3">Donor null</th>
-                        </tr>
-                        <tr id="ontology">
-                            <th id="c1ontology"></th>
-                            <th id="c2ontology"></th>
-                            <th id="c3ontology"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Test</td>
-                            <td>Another</td>
-                        </tr>
-                        <tr>
-                            <td>Test</td>
-                            <td>Another</td>
-                        </tr>
-                    </tbody>
-                </table>
+<form action="access.php" method="post" enctype="multipart/form-data">
+      <table align="left" width="100%" height="100%">
+      	<tr height="25px"></tr>
+        <tr>
+ 	<td width="150">Username:</td>
+    <td><input type="text" name="username" size="30" /></td>
+    </tr>
+    <tr>
+    	<td width="150">Password:</td>
+        <td><input type="password" name="password" size="30" /></td>
+    </tr>
+  <td  align='right'> 
+    <p>
+       <input type='submit' value='Submit' />
+    </p></td>
+ </tr>
+ </table>
+ </form>
