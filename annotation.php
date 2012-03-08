@@ -119,7 +119,7 @@ and open the template in the editor.
                     });  
                 });
             }
-
+         
          </script>
 
     </head>
@@ -139,7 +139,6 @@ and open the template in the editor.
                 <?php
                     include 'upload_file.php';
                 ?>
-                
             </div>
             <div id='loading' style="visibility: hidden"></div>
     </body>
