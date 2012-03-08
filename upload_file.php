@@ -70,8 +70,8 @@ else {              // if has some file pending, the API return the dir
                 case "xlsx":                                         // excel xlsx 
                     readXLSX($dir, $value);
                     break;
-                default:
-                    if(is_file($dir.$value)){                   // for all other file
+                default:                                            // for all other file
+                    if(is_file($dir.$value)){                   
                         copy($dir.$value, "upload/dataset/".$_POST['dataset']."/".$value);
                         unlink($dir.$value);
                         doAnnotation($dir);
@@ -191,8 +191,9 @@ else {              // if has some file pending, the API return the dir
             $return .= "</tbody></table>";
             copy($location.$file, "upload/dataset/".$_POST['dataset']."/".$file);
             unlink($location.$file);
-            $return .= '<br><br><input type=\'submit\' name=\'submit\' value=\'Submit\' onclick=validation(\''.$location.'&dataset='.$_POST['dataset'].'\'); />';
+            $return .= '<br><br><input id=\'submit\' type=\'submit\' name=\'submit\' value=\'Submit\' onclick="validation(\''.$location.'&dataset='.$_POST['dataset'].'\');" />';
             ini_set("auto_detect_line_endings", $old);
+            unset($csv);
             return $return;
         
     }
