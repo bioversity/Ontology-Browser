@@ -30,6 +30,7 @@ if (true){              // check if user has no file pending
                 break;
             default :
                 move_uploaded_file($_FILES["file"]["tmp_name"], $dir.$_FILES["file"]["name"]);
+                break;
         }
         doAnnotation($dir);
     }

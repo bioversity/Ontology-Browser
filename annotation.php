@@ -14,13 +14,14 @@ and open the template in the editor.
       
          <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
          <script type="text/javascript" src="jquery.ontologybrowser.js"></script>
+         <script type="text/javascript" src="jquery.logInfo.js"></script>
          <script type="text/javascript" src="jquery-impromptu.js"></script>
          <!-- tooltip javascript import -->
          <script type="text/javascript" src="glt.js"></script>
          <script>
              
             var CROPONTOLOGY_URL = "http://www.cropontology.org"; 
-             
+            var JSONS = {'test': [{'id':'1','op':'upload file', 'status':'running', 'progress':'10%', 'mess':'no mess'},{'id':'1','op':'upload file', 'status':'running', 'progress':'30%', 'mess':'no mess'},{'id':'2','op':'parsing file', 'status':'running', 'progress':'20%', 'mess':'no mess'},{'id':'1','op':'upload file', 'status':'waiting', 'progress':'50%', 'mess':'no mess'}]};
             $(function(){
                 $("table#table1 th").ontologyBrowser(function(termId, termName, elemClicked){
                     var elemClickedId = elemClicked['context'].id;
@@ -30,6 +31,7 @@ and open the template in the editor.
  //                   var newLocation = (window.location.href.indexOf("?")==-1) ? window.location.href+"?"+termId+"="+termName : window.location.href+"&"+termId+"="+termName ; 
  //                   window.location.href = newLocation;
                 });
+                $("div#log").logInfo('1',JSONS);
             });
             function searchForm(value){
                 $.ontologyBrowser.bindClick(value);
@@ -145,6 +147,8 @@ and open the template in the editor.
                 <?php
                     include 'upload_file.php';
                 ?>
+            
+                <div id="log"></div>
             </div>
             <div id='loading' style="visibility: hidden"></div>
     </body>

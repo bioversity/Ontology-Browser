@@ -36,6 +36,14 @@
     width: auto;
     overflow: auto;
 }
+#log {
+    background-color:black;
+    color: white;
+    overflow: auto;
+    height: 80px;
+    text-align: center;
+    font-size:12px;
+}
 #loading {
     border: 1px solid #000000;
     height: 600px;
