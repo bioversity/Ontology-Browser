@@ -11,17 +11,23 @@ and open the template in the editor.
         <link rel="stylesheet" type="text/css" href="css/jquery.treeview.css">
         <link rel="stylesheet" type="text/css" href="css/ontologybrowser.css">
         <link rel="stylesheet" type="text/css" href="css/details.css">
+        <link rel="stylesheet" type="text/css" href="css/log.css">
       
-         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-         <script type="text/javascript" src="jquery.ontologybrowser.js"></script>
-         <script type="text/javascript" src="jquery.logInfo.js"></script>
-         <script type="text/javascript" src="jquery-impromptu.js"></script>
+        <!-- import jquery -->
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+         <!-- import ontology browser widget -->
+         <script type="text/javascript" src="JS/jquery.ontologybrowser.js"></script>
+         <!-- import log information plugin -->
+         <script type="text/javascript" src="JS/jquery.logInfo.js"></script>
+         <!-- jquery for the details -->
+         <script type="text/javascript" src="JS/jquery-impromptu.js"></script>
          <!-- tooltip javascript import -->
-         <script type="text/javascript" src="glt.js"></script>
+         <script type="text/javascript" src="JS/glt.js"></script>
+         
          <script>
              
             var CROPONTOLOGY_URL = "http://www.cropontology.org"; 
-            var JSONS = {'test': [{'id':'1','op':'upload file', 'status':'running', 'progress':'10%', 'mess':'no mess'},{'id':'1','op':'upload file', 'status':'running', 'progress':'30%', 'mess':'no mess'},{'id':'2','op':'parsing file', 'status':'running', 'progress':'20%', 'mess':'no mess'},{'id':'1','op':'upload file', 'status':'waiting', 'progress':'50%', 'mess':'no mess'}]};
+            var JSONS = {'test': [{'userId':'1','fileId':'2','op':'upload file', 'status':'running', 'progress':'10%', 'mess':'no mess'},{'userId':'1','fileId':'2','op':'upload file', 'status':'running', 'progress':'30%', 'mess':'no mess'},{'id':'2','op':'parsing file', 'status':'running', 'progress':'20%', 'mess':'no mess'},{'userId':'1','fileId':'1','op':'upload file', 'status':'waiting', 'progress':'50%', 'mess':'no mess'}]};
             $(function(){
                 $("table#table1 th").ontologyBrowser(function(termId, termName, elemClicked){
                     var elemClickedId = elemClicked['context'].id;
@@ -31,8 +37,8 @@ and open the template in the editor.
  //                   var newLocation = (window.location.href.indexOf("?")==-1) ? window.location.href+"?"+termId+"="+termName : window.location.href+"&"+termId+"="+termName ; 
  //                   window.location.href = newLocation;
                 });
-                $("div#log").logInfo('1',JSONS);
-            });
+              //  $("div#log").logInfo('1',JSONS);
+                });
             function searchForm(value){
                 $.ontologyBrowser.bindClick(value);
             }
@@ -148,7 +154,16 @@ and open the template in the editor.
                     include 'upload_file.php';
                 ?>
             
-                <div id="log"></div>
+                <div id="log">
+                    <script>             
+                        $(document).ready( function() { 
+                            $('#log').load('log.php');
+                            setInterval( function() { 
+                                $('#log').load('log.php'); 
+                            }, 5000); 
+                        });
+                    </script>
+                </div>
             </div>
             <div id='loading' style="visibility: hidden"></div>
     </body>

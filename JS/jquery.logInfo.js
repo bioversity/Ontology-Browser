@@ -58,14 +58,22 @@
      */
     function checkUser(id, json,cb){
         var jsonElem = json.test.pop();
-        console.log(jsonElem)
         if (jsonElem){
             jsonToArray(jsonElem, function(arr){
             // arr[0]='id'; arr[1]=id_value; arr[i]=key; arr[i+1]=value
                 if(id==arr[1]){
-                    var p = $("<p></p>");
-                    for(var i=2; i<arr.length; i++){
-                        var span = $("<span id='"+ arr[i] + "'>" + arr[i+1] + "</span>");
+                    if (document.getElementById('fileID'+arr[3])){
+                           $('p#fileID'+arr[3]).remove();
+                    }
+                        else{
+                           var p = $("<p></p>");
+                           p.attr("id", 'fileID'+arr[3])
+                        }
+                    for(var i=4; i<arr.length; i++){
+                        if(arr[i]=='progress')
+                            var span = $("<span class='"+ arr[i] + "' value='"+arr[i+1]+"'>" + arr[i+1] + "</span>");
+                        else 
+                            var span = $("<span id='"+ arr[i] + "'>" + arr[i+1] + "</span>");
                         i++;
                         p.append(' ')
                         p.append(span);
@@ -74,7 +82,7 @@
                 }     
                 else
                     checkUser(id,json,cb);
-                cb(p);
+            cb(p);
             });
         }
     }
@@ -94,7 +102,7 @@
                         items.push(arr);
                     })
         callback(items)
-
+        console.log(items)
     }
     
     
