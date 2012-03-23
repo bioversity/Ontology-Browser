@@ -223,7 +223,7 @@ function makeLi(obj, last) {
     
     if (!has_children){
 //    if(relationship=='is_a'){
-        var selectArea = $('<span class="selection"><- use</span>');
+        var selectArea = $('<span class="selection"><-use</span>');
         selectArea.attr('onMouseOver','document.getElementById("'+idc+'").className="minibutton choosing"');
         selectArea.attr('onMouseOut','document.getElementById("'+idc+'").className="minibutton btn-watch"');
         selectArea.click(function(){
@@ -337,18 +337,178 @@ function buildOntologyTree(searchResult, searchValue, updateCallback){
                             li = makeLi(el, false);
                         else 
                             li = makeLi(el, true);
+                        //console.log($.makeArray(parent.parents()))
+                        //console.log(parent.parents().first())
                         // if(!parent.hasClass(elemId))
                         parent.append(li);
                         // parent becomes the first ul inside this li
                         parent = li.find("ul:first");
                         parent.show();   
+
+                        var arrApp = new Array()
+                        arrApp = $.makeArray(parent.parents())
+                        addToRootToChildArray(arrApp)
+
                     }  
                 }
 
+                buildTree(getRootToChildArray())
+                rootToChild = new Array()
+                setStile($root.children('li'))
                 $html.append($root)
                 updateCallback($html);
             });
         }
+    }
+
+    /**
+     * array used to store all the path for each element
+     */
+    var rootToChild = new Array();
+    /**
+     * @return the rootToChild Array
+     */
+    function getRootToChildArray(){
+        return rootToChild;
+    }
+    /**
+     * add an element to rootToChildArray
+     * @input: an array 
+     * @return: void
+     */
+    function addToRootToChildArray(array){
+        if(array.length>0)
+            rootToChild.push(array)
+   }
+   /**
+    * check if two array are equals
+    * @input: two array
+    * @return: true if the two array are equals, false otherwise
+    */
+    function compareArray(array1, array2){
+        if(array1.length != array2.length) 
+            return false
+        for (var i=0; i<array1.length; i++){
+            if (!elementEqual($(array1[i]),$(array2[i]))){
+                return false;
+                }
+        }
+        return true
+    }
+    /**
+     * check if an array is part of a list of array
+     * @input: array, list of array
+     * @return: true if the array is in the list, false otherwise
+     */
+    function inArrayList(array, list){
+        for(var i=0; i<list.length; i++)
+            if (compareArray(array,list[i]))
+                return true
+        return false
+    }
+    /**
+     * check if two elements are the same, usig the id
+     * @input: two element with id
+     * @return: true if the id is the same for both element
+     */
+    function elementEqual(el1, el2){
+        return (el1[0].id == el2[0].id)
+    }
+    /**
+     * return the first occurence in the dom
+     * @input: dom, element
+     * @return: first element
+     */
+    function firstOccurence(array, el){
+        for (var i=0; i<array.length; i++){
+            if(elementEqual(array[i],el)){
+                return $(array[i][0])
+            }
+        }
+        return false
+    }
+    /**
+     *  remove all duplicates in the dom
+     *  @input: dom element
+     *  @return: void
+     */
+    function removeDuplicate(element){
+        var app = new Array()
+        $.each(element.children('ul').children('li'), function(){
+            for(var i=0; i<app.length; i++){
+                if(elementEqual($(this), app[i]))
+                    $(this).remove()
+            }
+            app.push($(this))
+        })
+        // remove all empty element
+        $.each(element.children('ul'), function(){
+            if($.makeArray($(this).children('li')).length==0)
+                $(this).remove()
+        })
+    }
+    /**
+     * merge all element with the same path
+     * @input: rootToChild array
+     * @return: void, this function edit the dom 
+     */
+    function buildTree(arrayList){
+        var elArr = arrayList.pop();
+        if(inArrayList(elArr, arrayList)){
+            var parent = firstOccurence(arrayList,elArr)
+            var child = $(elArr[0]).children('ul');
+            parent.append(child)
+            $(elArr[0]).remove()
+            removeDuplicate(parent)
+            buildTree(arrayList)
+        }
+        else if(arrayList.length>0)
+            buildTree(arrayList)
+    }
+    
+    /**
+     *  edit the stile of the dom
+     */
+    function setStile(root){
+        var children = root.children('ul')
+        for (var i=0; i<children.length; i++){
+            var li = $(children[i]).children('li')
+            for(var j=0; j<li.length; j++){
+                if(j != (li.length-1)){
+                    $(li[j]).removeClass().addClass('expandable')
+                    $(li[j]).children('div').removeClass().addClass('hitarea expandable-hitarea')
+                }
+                else{
+                    $(li[j]).removeClass().addClass('last expandable lastExpandable')
+                    $(li[j]).children('div').removeClass().addClass('hitarea expandable-hitarea lastExpandable-hitarea')
+                }
+                setStileChild($(li[j]))
+            }
+        }
+    }
+    /**
+     *  recursive function for editing the style of the children element
+     */
+    function setStileChild(li){
+        var children = li.children('ul')
+        if(children.length == 1)
+            setStileChild(children.children('li'))
+        else{
+            for(var i=0; i<children.length; i++){
+                var li = children.children('li')
+                if(i != (children.length-1)){
+                    $(li[i]).removeClass().addClass('expandable')
+                    $(li[i]).children('div').removeClass().addClass('hitarea expandable-hitarea')
+                    setStileChild($(li[i]))
+                }
+                else{
+                    $(li[i]).removeClass().addClass('last expandable lastExpandable')
+                    $(li[i]).children('div').removeClass().addClass('hitarea expandable-hitarea lastExpandable-hitarea')
+                    setStileChild($(li[i]))
+                }
+            }
+        }
+            
     }
 
     /**

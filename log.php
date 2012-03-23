@@ -1,6 +1,7 @@
 <?php
 
-progressBar(60);
+progressBar(50);
+progressBar(100);
 
 function progressBar($percentage) {
 	print "<div id=\"progress-bar\" class=\"all-rounded\">\n";

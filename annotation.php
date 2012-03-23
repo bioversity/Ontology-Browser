@@ -17,8 +17,8 @@ and open the template in the editor.
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
          <!-- import ontology browser widget -->
          <script type="text/javascript" src="JS/jquery.ontologybrowser.js"></script>
-         <!-- import log information plugin -->
-         <script type="text/javascript" src="JS/jquery.logInfo.js"></script>
+         <!-- import log information plugin not used for the moment 
+         <script type="text/javascript" src="JS/jquery.logInfo.js"></script> -->
          <!-- jquery for the details -->
          <script type="text/javascript" src="JS/jquery-impromptu.js"></script>
          <!-- tooltip javascript import -->
@@ -158,9 +158,9 @@ and open the template in the editor.
                     <script>             
                         $(document).ready( function() { 
                             $('#log').load('log.php');
-                            setInterval( function() { 
+                            setInterval( function() {
                                 $('#log').load('log.php'); 
-                            }, 5000); 
+                            }, 100000000000000); 
                         });
                     </script>
                 </div>
