@@ -109,12 +109,13 @@ function Plugin( element) {
     this.init();
 }
 
+
 /**
  * @return: build the dialog calling varius function to create the tree
  */
 function openDialog($elem) {
     var exclude = $elem['context'].textContent;
-    if (oneTime.indexOf(exclude)==-1 || !document.getElementsByClassName('tip_form').length){
+    if ( !$('.tip_form').length){
         $elem.poshytip({
             className: 'tip_form',
             showTimeout: 1,
@@ -155,7 +156,7 @@ function search(text, callback) {
 }
 
 function bindClick(elem){
-    if(document.getElementsByClassName("tip_form")[0])
+    if($(".tip_form")[0])
         closeDialog();
     $elemClicked = $(elem);
     var $el = $(elem);
@@ -232,7 +233,7 @@ function makeLi(obj, last) {
             onClick(id, name, $elemClicked);
             closeDialog();
         });
-        li.append(selectArea)
+        li.append(selectArea);
         li.addClass("leaf");
     }
 
@@ -345,17 +346,17 @@ function buildOntologyTree(searchResult, searchValue, updateCallback){
                         parent = li.find("ul:first");
                         parent.show();   
 
-                        var arrApp = new Array()
-                        arrApp = $.makeArray(parent.parents())
-                        addToRootToChildArray(arrApp)
+                        var arrApp = new Array();
+                        arrApp = $.makeArray(parent.parents());
+                        addToRootToChildArray(arrApp);
 
                     }  
                 }
 
-                buildTree(getRootToChildArray())
-                rootToChild = new Array()
-                setStile($root.children('li'))
-                $html.append($root)
+                buildTree(getRootToChildArray());
+                rootToChild = new Array();
+                setStile($root.children('li'));
+                $html.append($root);
                 updateCallback($html);
             });
         }
@@ -378,7 +379,7 @@ function buildOntologyTree(searchResult, searchValue, updateCallback){
      */
     function addToRootToChildArray(array){
         if(array.length>0)
-            rootToChild.push(array)
+            rootToChild.push(array);
    }
    /**
     * check if two array are equals
@@ -387,7 +388,7 @@ function buildOntologyTree(searchResult, searchValue, updateCallback){
     */
     function compareArray(array1, array2){
         if(array1.length != array2.length) 
-            return false
+            return false;
         for (var i=0; i<array1.length; i++){
             if (!elementEqual($(array1[i]),$(array2[i]))){
                 return false;
@@ -403,8 +404,8 @@ function buildOntologyTree(searchResult, searchValue, updateCallback){
     function inArrayList(array, list){
         for(var i=0; i<list.length; i++)
             if (compareArray(array,list[i]))
-                return true
-        return false
+                return true;
+        return false;
     }
     /**
      * check if two elements are the same, usig the id
@@ -412,7 +413,7 @@ function buildOntologyTree(searchResult, searchValue, updateCallback){
      * @return: true if the id is the same for both element
      */
     function elementEqual(el1, el2){
-        return (el1[0].id == el2[0].id)
+        return (el1[0].id == el2[0].id);
     }
     /**
      * return the first occurence in the dom
@@ -422,10 +423,10 @@ function buildOntologyTree(searchResult, searchValue, updateCallback){
     function firstOccurence(array, el){
         for (var i=0; i<array.length; i++){
             if(elementEqual(array[i],el)){
-                return $(array[i][0])
+                return $(array[i][0]);
             }
         }
-        return false
+        return false;
     }
     /**
      *  remove all duplicates in the dom
@@ -437,14 +438,14 @@ function buildOntologyTree(searchResult, searchValue, updateCallback){
         $.each(element.children('ul').children('li'), function(){
             for(var i=0; i<app.length; i++){
                 if(elementEqual($(this), app[i]))
-                    $(this).remove()
+                    $(this).remove();
             }
-            app.push($(this))
+            app.push($(this));
         })
         // remove all empty element
         $.each(element.children('ul'), function(){
             if($.makeArray($(this).children('li')).length==0)
-                $(this).remove()
+                $(this).remove();
         })
     }
     /**
@@ -455,34 +456,34 @@ function buildOntologyTree(searchResult, searchValue, updateCallback){
     function buildTree(arrayList){
         var elArr = arrayList.pop();
         if(inArrayList(elArr, arrayList)){
-            var parent = firstOccurence(arrayList,elArr)
+            var parent = firstOccurence(arrayList,elArr);
             var child = $(elArr[0]).children('ul');
-            parent.append(child)
-            $(elArr[0]).remove()
-            removeDuplicate(parent)
-            buildTree(arrayList)
+            parent.append(child);
+            $(elArr[0]).remove();
+            removeDuplicate(parent);
+            buildTree(arrayList);
         }
         else if(arrayList.length>0)
-            buildTree(arrayList)
+            buildTree(arrayList);
     }
     
     /**
      *  edit the stile of the dom
      */
     function setStile(root){
-        var children = root.children('ul')
+        var children = root.children('ul');
         for (var i=0; i<children.length; i++){
-            var li = $(children[i]).children('li')
+            var li = $(children[i]).children('li');
             for(var j=0; j<li.length; j++){
                 if(j != (li.length-1)){
-                    $(li[j]).removeClass().addClass('expandable')
-                    $(li[j]).children('div').removeClass().addClass('hitarea expandable-hitarea')
+                    $(li[j]).removeClass().addClass('expandable');
+                    $(li[j]).children('div').removeClass().addClass('hitarea expandable-hitarea');
                 }
                 else{
-                    $(li[j]).removeClass().addClass('last expandable lastExpandable')
-                    $(li[j]).children('div').removeClass().addClass('hitarea expandable-hitarea lastExpandable-hitarea')
+                    $(li[j]).removeClass().addClass('last expandable lastExpandable');
+                    $(li[j]).children('div').removeClass().addClass('hitarea expandable-hitarea lastExpandable-hitarea');
                 }
-                setStileChild($(li[j]))
+                setStileChild($(li[j]));
             }
         }
     }
@@ -490,21 +491,21 @@ function buildOntologyTree(searchResult, searchValue, updateCallback){
      *  recursive function for editing the style of the children element
      */
     function setStileChild(li){
-        var children = li.children('ul')
+        var children = li.children('ul');
         if(children.length == 1)
-            setStileChild(children.children('li'))
+            setStileChild(children.children('li'));
         else{
             for(var i=0; i<children.length; i++){
-                var li = children.children('li')
+                var li = children.children('li');
                 if(i != (children.length-1)){
-                    $(li[i]).removeClass().addClass('expandable')
-                    $(li[i]).children('div').removeClass().addClass('hitarea expandable-hitarea')
-                    setStileChild($(li[i]))
+                    $(li[i]).removeClass().addClass('expandable');
+                    $(li[i]).children('div').removeClass().addClass('hitarea expandable-hitarea');
+                    setStileChild($(li[i]));
                 }
                 else{
-                    $(li[i]).removeClass().addClass('last expandable lastExpandable')
-                    $(li[i]).children('div').removeClass().addClass('hitarea expandable-hitarea lastExpandable-hitarea')
-                    setStileChild($(li[i]))
+                    $(li[i]).removeClass().addClass('last expandable lastExpandable');
+                    $(li[i]).children('div').removeClass().addClass('hitarea expandable-hitarea lastExpandable-hitarea');
+                    setStileChild($(li[i]));
                 }
             }
         }

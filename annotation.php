@@ -16,6 +16,7 @@ and open the template in the editor.
         <!-- import jquery -->
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
          <!-- import ontology browser widget -->
+         <script src="JS/JSON/json2.js" type="text/javascript"></script> 
          <script type="text/javascript" src="JS/jquery.ontologybrowser.js"></script>
          <!-- import log information plugin not used for the moment 
          <script type="text/javascript" src="JS/jquery.logInfo.js"></script> -->
@@ -82,7 +83,7 @@ and open the template in the editor.
             }
             
             function changeColumn(className, selected){
-                var column = document.getElementsByClassName(className);
+                var column = $("."+className);
                 if (selected)
                     $(column).addClass("unique").removeClass("notSelected");
                 else

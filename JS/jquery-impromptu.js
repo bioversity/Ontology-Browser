@@ -304,9 +304,9 @@
 		}
 		else{
                     // alling to poshytip element
-                    var $poshytip = $(document.getElementsByClassName('tip_form')[0])
+                    var $poshytip = $('.tip_form')
                     var offset = $poshytip.offset();
-                    var leftPos = (offset.left<$window.width()/2) ? offset.left+600 : offset.left-200;
+                    var leftPos = (offset.left<($window.width()/2)) ? parseInt(offset.left+600) : parseInt(offset.left-200);
                     var topPos = offset.top;
                     		$.prompt.jqi.css({
 				position: "absolute",
