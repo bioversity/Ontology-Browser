@@ -2,3 +2,6 @@
 /nbproject/
 .DS_Store
 /upload/
+.metadata
+
+.project
