@@ -106,27 +106,27 @@ and open the template in the editor.
                         document.getElementById('submit').style.visibility='hidden';
                         var currentId = $(this).attr('id');
                         var $currentElement = $(this);
-                            var currentValue = $(this).text();
-                            $.getJSON(CROPONTOLOGY_URL + "/search?callback=?&q=" + currentValue, function(data){ 
-                                if (data.length==1){
-                                    changeColumn(currentId, false);
-                                    $currentElement.attr('title', data[0].name+" [" + data[0].id + "]");
-                                    document.getElementById(currentId+"ontology").innerHTML = data[0].name+" ["+data[0].id+"]";
-                                }
-                                if (data.length > 1){
-                                    var title = "";
-                                    for(var i=0; i<data.length; i++)
-                                        title += data[i].name+" [" + data[i].id +"]<br>";
-                                    $currentElement.attr('title', title);
-                                    document.getElementById(currentId+"ontology").innerHTML = data.length+' different terms';
-                                }
-                                j++;    
-                                if (j==table.length){
-                                    document.getElementById('working_area').style.opacity='1';
-                                    document.getElementById('loading').style.visibility='hidden';
-                                    document.getElementById('submit').style.visibility='visible';
-                                }
-                            })
+                        var currentValue = $(this).text();
+                        $.getJSON(CROPONTOLOGY_URL + "/search?callback=?&q=" + currentValue, function(data){ 
+                            if (data.length==1){
+                                changeColumn(currentId, false);
+                                $currentElement.attr('title', data[0].name+" [" + data[0].id + "]");
+                                document.getElementById(currentId+"ontology").innerHTML = data[0].name+" ["+data[0].id+"]";
+                            }
+                            if (data.length > 1){
+                                var title = "";
+                                for(var i=0; i<data.length; i++)
+                                    title += data[i].name+" [" + data[i].id +"]<br>";
+                                $currentElement.attr('title', title);
+                                document.getElementById(currentId+"ontology").innerHTML = data.length+' different terms';
+                            }
+                            j++;    
+                            if (j==table.length){
+                                document.getElementById('working_area').style.opacity='1';
+                                document.getElementById('loading').style.visibility='hidden';
+                                document.getElementById('submit').style.visibility='visible';
+                            }
+                        })
                     });  
                 });
             }

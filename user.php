@@ -14,10 +14,7 @@ and open the template in the editor.
             <div id='header'></div>
 
             <div id='operations'>            
-                <p><a href="user.php">User Profile</a></p>
-                <p><a href="import.php">1. Import file</a></p>
-                <p><a href="#" >2. Validation</a></p>
-                <p><a href="#" style="color:red">Logout</a></p>
+				<?php include 'operations.html'; ?>
             </div>
             
             

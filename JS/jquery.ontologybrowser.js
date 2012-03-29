@@ -270,7 +270,7 @@ function closeDialog(){
 }
 
 /**
- * @input par-> the parameter to search
+ * @param par-> the parameter to search
  * @return the ontology tree if find something, otherwise the ontologies list 
  */
 function searchForm(par){
@@ -287,7 +287,7 @@ function searchForm(par){
  }
  
     /**
-     * @input: arr -> build the tree from the list of term
+     * @param: arr -> build the tree from the list of term
      * @return: the tree html
      */
 function buildOntologyTree(searchResult, searchValue, updateCallback){
@@ -374,7 +374,7 @@ function buildOntologyTree(searchResult, searchValue, updateCallback){
     }
     /**
      * add an element to rootToChildArray
-     * @input: an array 
+     * @param: an array 
      * @return: void
      */
     function addToRootToChildArray(array){
@@ -383,7 +383,7 @@ function buildOntologyTree(searchResult, searchValue, updateCallback){
    }
    /**
     * check if two array are equals
-    * @input: two array
+    * @param: two array
     * @return: true if the two array are equals, false otherwise
     */
     function compareArray(array1, array2){
@@ -398,7 +398,7 @@ function buildOntologyTree(searchResult, searchValue, updateCallback){
     }
     /**
      * check if an array is part of a list of array
-     * @input: array, list of array
+     * @param: array, list of array
      * @return: true if the array is in the list, false otherwise
      */
     function inArrayList(array, list){
@@ -409,7 +409,7 @@ function buildOntologyTree(searchResult, searchValue, updateCallback){
     }
     /**
      * check if two elements are the same, usig the id
-     * @input: two element with id
+     * @param: two element with id
      * @return: true if the id is the same for both element
      */
     function elementEqual(el1, el2){
@@ -417,7 +417,7 @@ function buildOntologyTree(searchResult, searchValue, updateCallback){
     }
     /**
      * return the first occurence in the dom
-     * @input: dom, element
+     * @param: dom, element
      * @return: first element
      */
     function firstOccurence(array, el){
@@ -430,7 +430,7 @@ function buildOntologyTree(searchResult, searchValue, updateCallback){
     }
     /**
      *  remove all duplicates in the dom
-     *  @input: dom element
+     *  @param: dom element
      *  @return: void
      */
     function removeDuplicate(element){
@@ -450,7 +450,7 @@ function buildOntologyTree(searchResult, searchValue, updateCallback){
     }
     /**
      * merge all element with the same path
-     * @input: rootToChild array
+     * @param: rootToChild array
      * @return: void, this function edit the dom 
      */
     function buildTree(arrayList){
@@ -513,7 +513,7 @@ function buildOntologyTree(searchResult, searchValue, updateCallback){
     }
 
     /**
-     * @input: data -> json from get-ontologies
+     * @param: data -> json from get-ontologies
      * @return: the tree with all ontologies
      */
 function listOntologies(updateCallback){
@@ -578,9 +578,9 @@ function loader(parent, show){
 
 /**
  * create the modal with the details
- * @input: json -> the json from get-attributes
- * @input: id -> the id of the element clicked
- * @input: name -> the name of the element clicked
+ * @param: json -> the json from get-attributes
+ * @param: id -> the id of the element clicked
+ * @param: name -> the name of the element clicked
  * 
  * @return the modal with the details
  */
