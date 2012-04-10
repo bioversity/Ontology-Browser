@@ -20,10 +20,21 @@ and open the template in the editor.
             
             <div id='working_area'>
                 <?php
+            		//
+					// Global includes.
+					//
+					require_once( '/Library/WebServer/Library/wrapper/includes.inc.php' );
+					
+					//
+					// Class includes.
+					//
+					require_once( kPATH_LIBRARY_DEFINES."Session.inc.php" );
+                	
+                
                    include 'working_area/logged.php';
                    
 				   echo "<pre>";
-				   print_r($_SESSION['user']);
+				   print_r($_SESSION[kSESSION_USER]);
 				   echo "</pre>";
                 ?>
             </div>

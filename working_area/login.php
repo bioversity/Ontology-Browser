@@ -9,68 +9,82 @@
 	// Class includes.
 	//
 	require_once( kPATH_LIBRARY_SOURCE."CMongoQuery.php" );
-	require_once( kPATH_LIBRARY_SOURCE."CMongoDataWrapperClient.php" );
+	require_once( kPATH_LIBRARY_SOURCE."CWarehouseWrapperClient.php" );
 	require_once( kPATH_LIBRARY_SOURCE."CMongoDataWrapper.inc.php" );
 	require_once( kPATH_LIBRARY_DEFINES."Session.inc.php" );
 	require_once( kPATH_LIBRARY_DEFINES."Offsets.inc.php" );
 	require_once( kPATH_LIBRARY_SOURCE."CWrapper.inc.php" );
+	
+	//
+	// Use raw parameters or use wrapper client?.
+	//
+	define( 'kUSE_CLIENT', TRUE );
+	
+	$url = 'http://localhost/newwrapper/WarehouseWrapper.php';
 
     $username = $_POST['username'];
     $password = $_POST['password'];
 	
-	$query = array
-	(
-		kOPERATOR_AND => array
-		(
-			0 => array
-			(
-				kAPI_QUERY_SUBJECT => ':CODE',
-				kAPI_QUERY_OPERATOR => kOPERATOR_EQUAL,
-				kAPI_QUERY_TYPE => kDATA_TYPE_STRING,
-				kAPI_QUERY_DATA => $username
-			),
-			
-			1 => array
-			(
-				kAPI_QUERY_SUBJECT => ':PASS',
-				kAPI_QUERY_OPERATOR => kOPERATOR_EQUAL,
-				kAPI_QUERY_TYPE => kDATA_TYPE_STRING,
-				kAPI_QUERY_DATA => $password
-			)
-		)
-	);
+	//
+	// Use wrapper client.
+	//
+	if( kUSE_CLIENT ){
+		//
+		// Build parameters.
+		//
+		$params = new CWarehouseWrapperClient( $url );
+		$params->Operation( kAPI_OP_LOGIN );
+		$params->Format( kDATA_TYPE_JSON );
+		$params->Database( 'TEST' );
+		$params->Container( 'CWarehouseWrapper' );
+		$params->Options( kAPI_OPT_SAFE, TRUE );
+		$params->UserCode( $username );
+		$params->UserPass( $password );
+		$params->LogTrace( TRUE );
+		$params->LogRequest( TRUE );
+		//
+		// Get response.
+		//
+		$decoded = $params->Execute();
+	}
+	//
+	// Use raw parameters.
+	//
+	else{
+
+		//
+		// Build parameters.
+		//
+		$params = Array();
+		$params[] = kAPI_OPERATION.'='.kAPI_OP_LOGIN;				// Command.
+		$params[] = kAPI_FORMAT.'='.kDATA_TYPE_JSON;				// Format.
+		$params[] = kAPI_OPT_USER_CODE.'='.$username;				// User code.
+		$params[] = kAPI_OPT_USER_PASS.'='.$password;				// User password.
+		$params[] = kAPI_DATABASE.'='.'TEST';						// Database.
+		$params[] = kAPI_CONTAINER.'='.'CWarehouseWrapper';			// Container.
+		$params[] = kAPI_OPT_LOG_TRACE.'='.'1';						// Trace exceptions.
+		$params[] = kAPI_OPT_LOG_REQUEST.'='.'1';					// Log request.
+		//
+		// Build request.
+		//
+		$request = $url.'?'.implode( '&', $params );
+		//
+		// Get response.
+		//
+		$response = file_get_contents( $request );
+		//
+		// Decode response.
+		//
+		$decoded = json_decode( $response, TRUE );
+	}
 	
-	$url = 'http://localhost/newwrapper/MongoDataWrapper.php';
-	
-	//
-	// Prepare query.
-	//
-	$query_enc = json_encode( $query );
-	//
-	// Build parameters.
-	//
-	$params = Array();
-	$params[] = kAPI_FORMAT.'='.kDATA_TYPE_JSON;				// Format.
-	$params[] = kAPI_OPERATION.'='.kAPI_OP_GET; 				// Command.
-	$params[] = kAPI_DATABASE.'='.'TEST';						// Database.
-	$params[] = kAPI_CONTAINER.'='.'ENTITIES';					// Container.
-	$params[] = kAPI_DATA_QUERY.'='.urlencode( $query_enc );	// Query.
-	//
-	// Build request.
-	//
-	$request = $url.'?'.implode( '&', $params );
-	//
-	// Get response.
-	//
-	$response = file_get_contents( $request );
-	//
-	// Decode response.
-	//
-	$decoded = json_decode( $response, TRUE );
+	echo "<pre>";
+	print_r($decoded);
+	echo "</pre>";
 
 	session_start();	
 	if($decoded[kAPI_DATA_STATUS][kTAG_STATUS]==0 && $decoded[kAPI_DATA_STATUS][kAPI_AFFECTED_COUNT]==1){
-		$_SESSION[kSESSION_USER] = $decoded[kAPI_DATA_RESPONSE][0];
+		$_SESSION[kSESSION_USER] = $decoded[kAPI_DATA_RESPONSE];
 	}
 
 	header('Location: ../user.php');
