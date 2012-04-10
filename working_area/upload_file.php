@@ -192,7 +192,7 @@ else {              // if has some file pending, the API return the dir
             $return .= "</tbody></table>";
             copy($location.$file, "upload/dataset/".$_POST['dataset']."/".$file);
             unlink($location.$file);
-            $return .= '<br><br><input id=\'submit\' type=\'submit\' name=\'submit\' value=\'Submit\' onclick="validation(\''.$location.'&dataset='.$_POST['dataset'].'\');" />';
+            $return .= '<br><br><input id=\'submit\' type=\'submit\' name=\'submit\' value=\'Submit\' onClick="validation(\''.$location.'&dataset='.$_POST['dataset'].'\');" />';
             ini_set("auto_detect_line_endings", $old);
             unset($csv);
             return $return;

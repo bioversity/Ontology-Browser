@@ -1,8 +1,8 @@
-<!--
-To change this template, choose Tools | Templates
-and open the template in the editor.
--->
 <!DOCTYPE html>
+<?php
+	include 'working_area/logged.php';
+?>
+	
 <html>
     <head>
         <title></title>
