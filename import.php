@@ -1,6 +1,7 @@
-<!DOCTYPE html>
 <?php
+	// check if the user is logged
 	include 'working_area/logged.php';
+	//echo "<pre>"; print_r($_SESSION); echo "</pre>";
 ?>
 	
 <html>
@@ -30,10 +31,26 @@
                 <form action="annotation.php" method="post" enctype="multipart/form-data">
                     <label for="dataset">Please choose the name of your dataset</label>
                     <input type="text" name="dataset" id="dataset">
+                    	<?php
+                    		if(isset($_SESSION['oldDataset']) && !empty($_SESSION['oldDataset'])){
+                    	?>
+			                    <label> or choose one from older dataset</label>
+			                    <select name="datasetOption">
+			                   	<option value=""></option>
+		                <?php
+	                    		foreach ($_SESSION['oldDataset'] as $dataset) {
+									echo "<option value='$dataset'>$dataset</option>";
+								}
+							}
+							else {
+								echo "<select name='datasetOption' style='visibility:hidden'>";
+							}
+                    	?>
+                    </select>
                     <br /><br />
                     <label for="file">File: </label>
                     <input type="file" name="file" id="file" />
-                    <br />
+                    <br /><br />
                     <input type="submit" name="import" value="Import File"  onclick="loading();"/>
                 </form>
             </div>

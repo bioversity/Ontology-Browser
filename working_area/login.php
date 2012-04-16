@@ -1,5 +1,4 @@
 <?php
-
 	//
 	// Global includes.
 	//
@@ -81,9 +80,9 @@
 	echo "<pre>";
 	print_r($decoded);
 	echo "</pre>";
-
+	
 	session_start();	
-	if($decoded[kAPI_DATA_STATUS][kTAG_STATUS]==0 && $decoded[kAPI_DATA_STATUS][kAPI_AFFECTED_COUNT]==1){
+	if( $decoded[kAPI_DATA_STATUS][kTAG_STATUS]==0 && $decoded[kAPI_DATA_STATUS][kAPI_AFFECTED_COUNT]==1 ){
 		$_SESSION[kSESSION_USER] = $decoded[kAPI_DATA_RESPONSE];
 	}
 

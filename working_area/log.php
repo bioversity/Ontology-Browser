@@ -1,6 +1,4 @@
 <?php
-
-
 progressBar(50);
 progressBar(100);
 

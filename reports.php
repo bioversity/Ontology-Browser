@@ -1,4 +1,8 @@
-<!DOCTYPE html>
+<?php
+	// check if the user is logged
+	include 'working_area/logged.php';
+	
+?>
 <html>
     <head>
         <title></title>
@@ -13,12 +17,9 @@
 				<?php include 'operations.html'; ?>
             </div>
             
-            
             <div id='working_area'>
                 <?php
-                   include 'working_area/logged.php';
-                   
-				   include 'working_area/validation.php';
+			   		include 'working_area/validation.php';
                 ?>
             </div>
             <div id='loading' style="visibility: hidden"></div>

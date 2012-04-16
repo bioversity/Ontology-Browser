@@ -1,5 +1,4 @@
 <?php
-	
 	//
 	// Global includes.
 	//
@@ -12,7 +11,9 @@
 	
 	session_start();
 	
-	if(!(isset($_SESSION[kSESSION_USER])))
+	// if the user is not logged in redirect to index
+	if(!(isset($_SESSION[kSESSION_USER]))){
 		header("Location: index.php");
-	
+		exit;
+	}
 ?>

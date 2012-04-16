@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+<?php 
+	header_remove();
+?>
 <html>
     <head>
         <title></title>
@@ -17,17 +19,13 @@
             
             <div id='working_area'>
             	<?php
-        			//
 					// Global includes.
-					//
 					require_once( '/Library/WebServer/Library/wrapper/includes.inc.php' );
-					
-					//
 					// Class includes.
-					//
 					require_once( kPATH_LIBRARY_DEFINES."Session.inc.php" );
             	
             		session_start();
+					// check if the user is logged, if true redirect to the user profile page
 					if((isset($_SESSION[kSESSION_USER])))
 						header("Location: user.php");
 					else {

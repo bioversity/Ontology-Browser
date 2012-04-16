@@ -1,7 +1,15 @@
-<!DOCTYPE html>
 <?php
+	// includes all library to read the files
+    require_once 'File_Excel/PHPExcel.php';
+    require_once 'File_Excel/PHPExcel/IOFactory.php';
+    require_once 'File_Excel/simplexlsx.class.php';
+	require_once "File_CSV/File_CSV/DataSource.php";	
+	// check if the user is logged
 	include 'working_area/logged.php';
+	
+	//echo "<pre>"; print_r($_POST); echo "</pre>";
 ?>
+<!DOCTYPE text/html>
 <html>
     <head>
         <title></title>
@@ -17,8 +25,6 @@
          <!-- import ontology browser widget -->
          <script src="JS/JSON/json2.js" type="text/javascript"></script> 
          <script type="text/javascript" src="JS/jquery.ontologybrowser.js"></script>
-         <!-- import log information plugin not used for the moment 
-         <script type="text/javascript" src="JS/jquery.logInfo.js"></script> -->
          <!-- jquery for the details -->
          <script type="text/javascript" src="JS/jquery-impromptu.js"></script>
          <!-- tooltip javascript import -->
@@ -27,60 +33,19 @@
          <script>
              
             var CROPONTOLOGY_URL = "http://www.cropontology.org"; 
-//            var JSONS = {'test': [{'userId':'1','fileId':'2','op':'upload file', 'status':'running', 'progress':'10%', 'mess':'no mess'},{'userId':'1','fileId':'2','op':'upload file', 'status':'running', 'progress':'30%', 'mess':'no mess'},{'id':'2','op':'parsing file', 'status':'running', 'progress':'20%', 'mess':'no mess'},{'userId':'1','fileId':'1','op':'upload file', 'status':'waiting', 'progress':'50%', 'mess':'no mess'}]};
             $(function(){
                 $("table#table1 th").ontologyBrowser(function(termId, termName, elemClicked){
                     var elemClickedId = elemClicked['context'].id;
                     var newId = elemClicked['context'].id+"ontology" ;
                     document.getElementById(newId).innerHTML=termName+" ["+termId+"]"; // put the id between [ ]
                     changeColumn(elemClickedId, true);
- //                   var newLocation = (window.location.href.indexOf("?")==-1) ? window.location.href+"?"+termId+"="+termName : window.location.href+"&"+termId+"="+termName ; 
- //                   window.location.href = newLocation;
                 });
-              //  $("div#log").logInfo('1',JSONS);
-                });
+            });
+
             function searchForm(value){
                 $.ontologyBrowser.bindClick(value);
             }
 
-            function getXMLHttp(){
-                    var xmlHttp
-                    try{
-                        //Firefox, Opera 8.0+, Safari
-                        xmlHttp = new XMLHttpRequest();
-                    } catch(e) {
-                        //Internet Explorer
-                        try {
-                        xmlHttp = new ActiveXObject("Msxml2.XMLHTTP");
-                        } catch(e) {
-                            try {
-                                xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
-                            } catch(e) {
-                                alert("Your browser does not support AJAX!")
-                                return false;
-                            }
-                        }
-                    }
-                    return xmlHttp;
-                }
-
-            function MakeRequest(value, getValue) {
-                var xmlHttp = getXMLHttp();
-                xmlHttp.onreadystatechange = function() {
-                    if(xmlHttp.readyState == 4) {
-                        HandleResponse(xmlHttp.responseText);
-                    }
-                }
-                if (getValue)
-                    xmlHttp.open("GET", value+".php?"+getValue, true);
-                else
-                    xmlHttp.open("GET", value+".php", true);
-                xmlHttp.send(null);
-            }
-            function HandleResponse(response) {
-                document.getElementById('working_area').innerHTML = response;
-            }
-            
             function changeColumn(className, selected){
                 var column = $("."+className);
                 if (selected)
@@ -90,11 +55,14 @@
             }
             
             function validation(dir){
-                var getValue="?doAnnotation="+dir;
+                var getValue="?temporary="+dir;
                 loading();
                 window.location = "annotation.php"+getValue;
             }
-         // show how many ontologies find for all headers
+         	
+         	/**
+         	 *  show how many ontologies find for all headers
+         	 */
             function annotation(){
                 $(function(){
                     var table =$("table#table1 th");
@@ -144,7 +112,7 @@
             <div id='operations'> <?php include 'operations.html'; ?> </div>
             
             
-            <div id='working_area'>
+            <div id='working_area'>	
                 <?php
                     include 'working_area/upload_file.php';
                 ?>
