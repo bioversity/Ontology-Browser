@@ -28,7 +28,7 @@
             
             <div id='working_area'>
                 <?php
-                	$userFolder = new Folder($_SESSION[kSESSION_USER][':CODE']);
+                	$userFolder = new Folder($_SESSION[kSESSION_USER]['_id'][':DATA']);
 					$temporary = $userFolder->getFolderTemporary();
 					$dataset = $userFolder->getFolderDataset();
 					echo "<pre><b>Files in dataset folder</b><br>";
@@ -42,20 +42,20 @@
 					   	print_r($userFolder->listDataset());
 					   	echo "</pre>";
 						
-						if(empty($_SESSION['oldDataset'])){
-							$_SESSION['oldDataset'] = $userFolder->listDataset();
+						if(empty($_SESSION[kSESSION_USER]['oldDataset'])){
+							$_SESSION[kSESSION_USER]['oldDataset'] = $userFolder->listDataset();
 						}
 						
-						echo "click on the name to remove the dataset, please note you will delete all file included in that folder<br>";
+						echo "click on the name to remove the dataset, please note you will delete all files included in that folder<br>";
 						foreach ($userFolder->listDataset() as $datasetValue) {
 							if(!$userFolder->isEmptyDir($dataset.$datasetValue))
 								echo "<a href='user.php?removed=".$dataset.$datasetValue."'>$datasetValue</a><br>";
 						}
 						if(isset($_GET['removed'])){
 							$userFolder->rrmdir($_GET['removed']);
-							for($i=0; $i<count($_SESSION['oldDataset']); $i++){
-								if($_SESSION['oldDataset'][$i]==$datasetValue){
-									unset($_SESSION['oldDataset'][$i]);
+							for($i=0; $i<count($_SESSION[kSESSION_USER]['oldDataset']); $i++){
+								if($_SESSION[kSESSION_USER]['oldDataset'][$i]==$datasetValue){
+									unset($_SESSION[kSESSION_USER]['oldDataset'][$i]);
 								}
 							}
 							header('Location: user.php');
@@ -65,7 +65,7 @@
 					echo "<pre><b>Files in temporary folder</b><br>";
 				   	print_r($userFolder->fileList($temporary, true));
 				   	echo "</pre>";
-				   	echo "click on the name to analyse the file in the directory<br>";
+				   	echo "click on the name to analyse all files in the temporary directory<br>";
 					if ($handle = opendir($temporary)) {
 					    while (false !== ($entry = readdir($handle))) {
 					    	$temporaryPath = $temporary.$entry."/";
@@ -74,7 +74,7 @@
 					    }
 					    closedir($handle);
 					}	
-					echo "click on the name to remove the temporary folder, please note you will delete all file included in that folder<br>";
+					echo "click on the name to remove the temporary folder, please note you will delete all files included in that folder<br>";
 					if ($handle = opendir($temporary)) {
 					    while (false !== ($entry = readdir($handle))) {
 					    	$temporaryPath = $temporary.$entry."/";

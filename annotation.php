@@ -7,7 +7,7 @@
 	// check if the user is logged
 	include 'working_area/logged.php';
 	
-	//echo "<pre>"; print_r($_POST); echo "</pre>";
+	//echo "<pre>"; print_r($_GET); echo "</pre>";
 ?>
 <!DOCTYPE text/html>
 <html>
@@ -54,22 +54,28 @@
                     $(column).addClass("selected").removeClass("notSelected");
             }
             
-            function validation(dir){
-                var getValue="?temporary="+dir;
+            function validation(getValue){
+            	var tr = $('#ontology').children();
+        		var values = new Array();	
+            	for(var i=1; i<(tr.length+1); i++){
+                    values.push($('#C'+i+'ontology').text());
+            	}
+        		getValue += '&columnsValue='+values;
+
                 loading();
                 window.location = "annotation.php"+getValue;
             }
          	
          	/**
-         	 *  show how many ontologies find for all headers
+         	 * show how many ontologies find for all headers,
+         	 * if is unique display the term finded
          	 */
             function annotation(){
                 $(function(){
                     var table =$("table#table1 th");
                     var j = 0;
                     $("table#table1 th").each(function(){
-                        document.getElementById('working_area').style.opacity='0.4';
-                        document.getElementById('loading').style.visibility='visible';
+                        loading();
                         document.getElementById('submit').style.visibility='hidden';
                         var currentId = $(this).attr('id');
                         var $currentElement = $(this);

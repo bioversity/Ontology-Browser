@@ -11,10 +11,19 @@
         <link rel="stylesheet" type="text/css" href="css/main.css">
 
          <script>
-             function loading(){
-                document.getElementById('working_area').style.opacity='0.4';
-                document.getElementById('loading').style.visibility='visible';
-             }
+         	
+     		function checkDataset(form){
+	     		if(form.dataset.value=="" || form.dasetOption.value==""){	
+	     			document.getElementById('working_area').style.opacity='1';
+	           		document.getElementById('loading').style.visibility='hidden';
+	     			return false;
+	     		}
+	     		return true
+     		}
+         	function loading(){
+	            document.getElementById('working_area').style.opacity='0.4';
+	            document.getElementById('loading').style.visibility='visible';
+        	}
          </script>
 
     </head>
@@ -28,17 +37,17 @@
             
             
             <div id='working_area'>
-                <form action="annotation.php" method="post" enctype="multipart/form-data">
+                <form action="annotation.php" method="post" enctype="multipart/form-data" onsubmit="return checkDataset(this)">
                     <label for="dataset">Please choose the name of your dataset</label>
                     <input type="text" name="dataset" id="dataset">
                     	<?php
-                    		if(isset($_SESSION['oldDataset']) && !empty($_SESSION['oldDataset'])){
+                    		if(isset($_SESSION[kSESSION_USER]['oldDataset']) && !empty($_SESSION[kSESSION_USER]['oldDataset'])){
                     	?>
 			                    <label> or choose one from older dataset</label>
-			                    <select name="datasetOption">
+			                    <select id="datasetOption" name="datasetOption">
 			                   	<option value=""></option>
 		                <?php
-	                    		foreach ($_SESSION['oldDataset'] as $dataset) {
+	                    		foreach ($_SESSION[kSESSION_USER]['oldDataset'] as $dataset) {
 									echo "<option value='$dataset'>$dataset</option>";
 								}
 							}
@@ -51,7 +60,7 @@
                     <label for="file">File: </label>
                     <input type="file" name="file" id="file" />
                     <br /><br />
-                    <input type="submit" name="import" value="Import File"  onclick="loading();"/>
+                    <input type="submit" name="import" value="Import File"  onClick="loading();"/>
                 </form>
             </div>
             <div id='loading' style="visibility: hidden"></div>

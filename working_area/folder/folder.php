@@ -1,16 +1,16 @@
 <?php
-
-	/**
-	 * import the folders name
-	 */ 
-	require_once 'defines/folder.inc.php';
- 
 	/**
 	 * This file contains the class definition for the folder
 	 * 
 	 * @author Marco Frangella <m.frangella@cgiar.org>;
 	 * @version 1.0 11/04/2012
 	 */
+
+	/**
+	 * import the folders name
+	 */ 
+	require_once 'defines/folder.inc.php';
+ 
 	class Folder{
 			
 		private static $path;
@@ -19,8 +19,8 @@
 		
 		/**
 		 * construct for the class Folder;
-		 * inizialyze the path array with the 
-		 * temporary and dataset folders
+		 * initialize the path array with the temporary and dataset folders
+		 * @param	$folderName 	the user code, used to create the personal folder
 		 */		
 		public function __construct($folderName){
 			if(empty(self::$path)){
@@ -33,9 +33,9 @@
 		/**
 		 * create the folder for the current user, if not exist,
 		 * with the relative dataset and temporary folder, if not exist.
-		 * @param	the user code	used to  create the personal folder
+		 * @param	$folderName		the user code used to  create the personal folder
 		 */
-		protected function init($folderName){
+		private function init($folderName){
 			// create the folder relative to the user if not exist
 			if(!file_exists(folderUpload."/".$folderName."/")){
 				mkdir(folderUpload."/".$folderName."/", 0777, true);
@@ -134,7 +134,7 @@
     	}
 		
 		/**
-		 * function used to read all files in the directory and create the 10 rows table
+		 * function used to read all files in the directory and create the 10 rows table in html format
 		 * @param	$dir	the directory to scan
 		 * @return	html	10 rows table with the content of each files
 		 */ 
@@ -307,7 +307,7 @@
 	                $i++;
 	            }
 	            $return .= "</tbody></table>";
-	            $return .= '<br><br><input id=\'submit\' type=\'submit\' name=\'submit\' value=\'Submit\' onClick="validation(\''.$location.'&dataset='.self::getFolderDataset().'&prevFile='.$file.'\');" />';
+	            $return .= '<br><br><input id=\'submit\' type=\'submit\' name=\'submit\' value=\'Submit\' onClick="validation(\'?temporary='.$location.'&dataset='.self::getFolderDataset().'&prevFile='.$file.'\');" />';
 	            ini_set("auto_detect_line_endings", $old);
 	            unset($csv);
 	            return $return;
@@ -370,7 +370,9 @@
 		}
 		
 		/**
-		 * 
+		 * check if a directory is empty
+		 * @param	$dir		the directory to check
+		 * @return	boolean		TRUE if it is empty, FALSE otherwise 
 		 */
 		public function isEmptyDir($dir){
 			$files = self::fileList($dir, true);	
@@ -378,12 +380,28 @@
 		}
 		
 		/**
+		 * return the directory name
 		 * @param	$directory		the path of the directory
 		 * @return	String			the name of the directory
 		 */
 		function toString($directory){
-			return pathinfo($directory,PATHINFO_DIRNAME);
+			return pathinfo($directory, PATHINFO_DIRNAME);
 		}
 		
+		/**
+		 * create a file .properties contais the array with the selected value 
+		 * @param	$directory		the dataset folder 
+		 * @param	$contents		the array with the informations selected by the user
+		 * @param	$file			the current file
+		 */
+		 public function createProperties($directory, $contents, $file){
+		 	$fileProperties = fopen($directory.$file.'.properties', 'w');
+			fwrite($fileProperties, "Array ( \n");
+			foreach ($contents as $key => $value) {
+				fwrite($fileProperties, "\t[$key] => $value\n");
+			}   
+			fwrite($fileProperties, " )");
+            fclose($fileProperties);
+		 }
 	}
 ?>

@@ -9,7 +9,7 @@
 		// import the folder class
 		require_once 'folder/folder.php';
 		
-		$user = $_SESSION[kSESSION_USER][':CODE'];
+		$user = $_SESSION[kSESSION_USER]['_id'][':DATA'];
 		$userFolder = new Folder($user);
 		
 		
@@ -22,20 +22,18 @@
 				$currentDataset = substr($_GET['dataset'], -(stripos($_GET['dataset'], "/")));
 				$userFolder->setCurrentDataset($currentDataset);
 			}
-//            $_SESSION[$_GET['temporary']] = $userFolder->getFolderDataset();
-//			print_r($_SESSION);
-			
+
 			if(isset($_GET['prevFile'])){
 				copy($_GET['temporary'].$_GET['prevFile'], $_GET['dataset'].$_GET['prevFile']); 				// move the previus file from temporary folder to dataset folder 
 	            unlink($_GET['temporary'].$_GET['prevFile']);													// delete the previus file from temporary folder
             }
             
-            
 			if(!file_exists($_GET['temporary'])){						// check if there's any file in the folder, 
 				unset($_SESSION[$_GET['temporary']]);   				// otherwise unset the relative session
 			}
 			else {
-				$userFolder->doAnnotation($_GET['temporary']);
+				if(!$userFolder->doAnnotation($_GET['temporary']))		// if doAnnotation return false, means that there isn't any other file
+					unset($_SESSION[$_GET['temporary']]);
 			}
 		}
 		else {													// if not exist
@@ -47,6 +45,9 @@
 			// destroy the session with the relationship between temporary and dataset
 			unset($_SESSION[$_GET['temporary']]);
 		}
+
+		// create the properties file
+		$userFolder->createProperties($userFolder->getFolderDataset(), (explode(',',$_GET['columnsValue'])), $_GET['prevFile']);
     }
     else{
 	    
@@ -56,11 +57,11 @@
 		$dataset = (!empty($_POST['datasetOption'])) ? $_POST['datasetOption'] : $_POST['dataset'];
 
 		// create the list of the dataset
-		if (isset($_SESSION['oldDataset']) && !in_array($dataset, $_SESSION['oldDataset'])){
-			$_SESSION['oldDataset'][] = $dataset;
+		if (isset($_SESSION[kSESSION_USER]['oldDataset']) && !in_array($dataset, $_SESSION[kSESSION_USER]['oldDataset'])){
+			$_SESSION[kSESSION_USER]['oldDataset'][] = $dataset;
 		}
-		else if(!isset($_SESSION['oldDataset']))
-			$_SESSION['oldDataset'][] = $dataset;
+		else if(!isset($_SESSION[kSESSION_USER]['oldDataset']))
+			$_SESSION[kSESSION_USER]['oldDataset'][] = $dataset;
 
 		// set current dataset
 	    $userFolder->setCurrentDataset($dataset);
