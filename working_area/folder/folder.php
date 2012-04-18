@@ -141,17 +141,14 @@
 		public function doAnnotation($dir){
 	        $files = self::getFiles($dir);
 	        if(empty($files)){              
-	            rmdir($dir);                	// remove empty folder
-	           	echo "no more file";
-				echo "<br>"; 
-	            echo "to view the report of your imported file please go to the <a href='reports.php'>validation</a> page";
-				echo "<br><br>";
-				return FALSE;
+	            rmdir($dir);                								// remove empty folder
+	           	include 'noFile.html';										// print the noFile page
+				return FALSE;												// return FALSE to unset the SESSION variable
 	        }
 
-            $value = $files[0];
-			if(filesize($dir.$value)==0){									
-				unlink($dir.$value);										// check if file is not empty
+            $value = $files[0];												// get the first file in the folder
+			if(filesize($dir.$value)==0){									// check if file is empty
+				unlink($dir.$value);										
 				self::doAnnotation($dir);
 			}
 			else {
@@ -175,6 +172,7 @@
 	                    }
 	                    break;
 	            }
+				return TRUE;
 			}
 	    }
 		
@@ -266,8 +264,8 @@
 	            $csv = new File_CSV_DataSource;
 	            // import the csv file or die with the error in read csv
 	            $csv -> load($location.$file) or die('error in read csv');
-	            $return = '<p><input type="radio" name="valutation" value="passport" onclick="annotation();"/>passport';
-				$return .= '<input type="radio" name="valutation" value="attachment" onclick="attachment();"/>attachment</p>';
+	            $return = '<p><input type="radio" name="valutation" value="passport" onClick="annotation();"/>passport';
+				$return .= '<input type="radio" name="valutation" value="attachment" onClick="validation(\'?attachment=1&temporary='.$location.'&dataset='.self::getFolderDataset().'&prevFile='.$file.'\');"/>attachment (skip file)</p>';
 	            $return .= "<table id='table1'><thead><tr id='user'>";
 	            // check if the file is comma or tab separated
 	            $countComma = count($csv->getHeaders());
@@ -307,7 +305,7 @@
 	                $i++;
 	            }
 	            $return .= "</tbody></table>";
-	            $return .= '<br><br><input id=\'submit\' type=\'submit\' name=\'submit\' value=\'Submit\' onClick="validation(\'?temporary='.$location.'&dataset='.self::getFolderDataset().'&prevFile='.$file.'\');" />';
+	            $return .= '<br><br><input id=\'submit\' type=\'submit\' name=\'submit\' value=\'Submit\' onClick="validation(\'?temporary='.$location.'&dataset='.self::getFolderDataset().'&prevFile='.$file.'&attachment=0\');" />';
 	            ini_set("auto_detect_line_endings", $old);
 	            unset($csv);
 	            return $return;
@@ -350,12 +348,12 @@
 		 */
 		public function listDataset(){
 			$array = scandir(self::getFolderDataset());
-			$exclude = $exempt = array('.','..');
+			$exclude = array('.','..','.DS_Store','.svn', '._.ds_store', '__macosx');
 			return array_values(array_diff($array, $exclude));
 		}
 		
 		/**
-		 * remove the folder 
+		 * remove the folder 	example of path: folder1/folder2/
 		 * @param	$dir		the directory to remove
 		 * @return	boolean		TRUE on success or FALSE on failure
 		 */
@@ -391,16 +389,12 @@
 		/**
 		 * create a file .properties contais the array with the selected value 
 		 * @param	$directory		the dataset folder 
-		 * @param	$contents		the array with the informations selected by the user
 		 * @param	$file			the current file
+		 * @param	$contents		the array with the informations selected by the user
 		 */
-		 public function createProperties($directory, $contents, $file){
+		 public function createProperties($directory, $file, $contents){
 		 	$fileProperties = fopen($directory.$file.'.properties', 'w');
-			fwrite($fileProperties, "Array ( \n");
-			foreach ($contents as $key => $value) {
-				fwrite($fileProperties, "\t[$key] => $value\n");
-			}   
-			fwrite($fileProperties, " )");
+			fwrite($fileProperties, serialize($contents));
             fclose($fileProperties);
 		 }
 	}

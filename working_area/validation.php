@@ -1,52 +1,24 @@
 <?php
-	//
-	// Global includes.
-	//
-	require_once( '/Library/WebServer/Library/wrapper/includes.inc.php' );
 	
-	//
-	// Style includes.
-	//
-	require_once( '/Library/WebServer/Library/wrapper/styles.inc.php' );
+	// import the folder class
+	require_once 'folder/folder.php';
 	
-	//
-	// Class includes.
-	//
-	require_once( kPATH_LIBRARY_SOURCE."CMongoDataWrapper.php" );
+	$user = $_SESSION[kSESSION_USER]['_id'][':DATA'];
+	$userFolder = new Folder($user);
 	
+	$dataset = $userFolder->getFolderDataset();
+	$datasetFiles = $userFolder->fileList($dataset, true);
 	
-	/*=======================================================================================
-	 *	TEST WRAPPER OBJECT																	*
-	 *======================================================================================*/
-	 
-	//
-	// Init local storage.
-	//
-	$url = 'http://localhost/newwrapper/MongoDataWrapper.php';
+	echo "File list<pre>";
+	print_r($datasetFiles);
+	echo "</pre>";
 	
-	//
-	// Build parameters.
-	//
-	$params = Array();
-	$params[] = kAPI_FORMAT.'='.kDATA_TYPE_JSON;				// Format.
-	$params[] = kAPI_OPERATION.'='.kAPI_OP_GET;					// Command.
-	$params[] = kAPI_DATABASE.'='.'TEST';						// Database.
-	$params[] = kAPI_CONTAINER.'='.'CMongoDataWrapper';			// Container.
-	//
-	// Build request.
-	//
-	$request = $url.'?'.implode( '&', $params );
-	//
-	// Get response.
-	//
-	$response = file_get_contents( $request );
-	//
-	// Decode response.
-	//
-	$decoded = json_decode( $response, TRUE );
-	
-	echo( '<pre>' ); 
-	print_r( $decoded ); 
-	echo( '</pre>' );
+	foreach ($datasetFiles as $file) {
+		if(strpos($file, '.properties')){
+			echo "$file<pre>";
+			print_r(unserialize(file_get_contents($file)));
+			echo "</pre>";
+		}
+	}
 
 ?>

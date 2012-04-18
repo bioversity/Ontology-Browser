@@ -15,39 +15,32 @@
 		
     if(isset($_GET['temporary'])){											// check if is setted the value of Get to execute directly doAnnotation
 	    if(file_exists($_GET['temporary']))	{								// check if the temporary folder exist
-			if (file_exists($_GET['dataset'])){								// check if exist the dataset
+			
+			if (file_exists($_GET['dataset'])){													// check if exist the dataset
 				$userFolder->setFolderDataset($_GET['dataset']);
 			}
-			else {
+			else {																				// or create the dataset
 				$currentDataset = substr($_GET['dataset'], -(stripos($_GET['dataset'], "/")));
 				$userFolder->setCurrentDataset($currentDataset);
 			}
 
-			if(isset($_GET['prevFile'])){
+			if(isset($_GET['prevFile'])){																		// check if there is a previous file
 				copy($_GET['temporary'].$_GET['prevFile'], $_GET['dataset'].$_GET['prevFile']); 				// move the previus file from temporary folder to dataset folder 
 	            unlink($_GET['temporary'].$_GET['prevFile']);													// delete the previus file from temporary folder
             }
             
-			if(!file_exists($_GET['temporary'])){						// check if there's any file in the folder, 
-				unset($_SESSION[$_GET['temporary']]);   				// otherwise unset the relative session
-			}
-			else {
-				if(!$userFolder->doAnnotation($_GET['temporary']))		// if doAnnotation return false, means that there isn't any other file
-					unset($_SESSION[$_GET['temporary']]);
-			}
+			if(!$userFolder->doAnnotation($_GET['temporary']))													// if doAnnotation return false, means that there isn't any other file
+				unset($_SESSION[$_GET['temporary']]);
 		}
-		else {													// if not exist
-			echo "no more file";
-			echo "<br>"; 
-            echo "to view the report of your imported file please go to the <a href='reports.php'>validation</a> page";
-			echo "<br><br>";
-			
+		else {																// if not exist
+			include 'folder/noFile.html';					
 			// destroy the session with the relationship between temporary and dataset
 			unset($_SESSION[$_GET['temporary']]);
 		}
 
-		// create the properties file
-		$userFolder->createProperties($userFolder->getFolderDataset(), (explode(',',$_GET['columnsValue'])), $_GET['prevFile']);
+		// create the properties file if is not selected attachment
+		if(isset($_GET['attachment']) && !($_GET['attachment']))
+			$userFolder->createProperties($userFolder->getFolderDataset(), $_GET['prevFile'], (explode(',',$_GET['columnsValue'])));
     }
     else{
 	    
