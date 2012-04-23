@@ -1,6 +1,11 @@
 <?php
+	//import capped class
+	require_once 'working_area/logMessage/cappedCollection.php';
+	// include store class
+	require_once 'working_area/store/store.php';
+	
 	// check if the user is logged
-	include 'working_area/logged.php';
+	include_once 'working_area/logged.php';
 	
 ?>
 <html>

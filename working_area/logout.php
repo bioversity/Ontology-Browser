@@ -8,7 +8,8 @@
 	// Class includes.
 	//
 	require_once( kPATH_LIBRARY_DEFINES."Session.inc.php" );
-
+	require_once( kPATH_LIBRARY_DEFINES."Offsets.inc.php" );
+	
 	session_start();
 //	session_unset();
 //	session_destroy();

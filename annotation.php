@@ -1,13 +1,10 @@
 <?php
-	// includes all library to read the files
-    require_once 'File_Excel/PHPExcel.php';
-    require_once 'File_Excel/PHPExcel/IOFactory.php';
-    require_once 'File_Excel/simplexlsx.class.php';
-	require_once "File_CSV/File_CSV/DataSource.php";	
+	// include store class to store the file into MongoDB
+	require_once 'working_area/store/store.php';
 	// check if the user is logged
 	include 'working_area/logged.php';
 	
-	//echo "<pre>"; print_r($_GET); echo "</pre>";
+//	echo "<pre>"; print_r($_SESSION); echo "</pre>";
 ?>
 <!DOCTYPE text/html>
 <html>
@@ -31,7 +28,9 @@
          <script type="text/javascript" src="JS/glt.js"></script>
          
          <script>
-             
+            /**
+             * call the ontologyBrowser plugin
+             */ 
             var CROPONTOLOGY_URL = "http://www.cropontology.org"; 
             $(function(){
                 $("table#table1 th").ontologyBrowser(function(termId, termName, elemClicked){
@@ -42,10 +41,16 @@
                 });
             });
 
+			/**
+			 * bind click for ontology browser plugin
+			 */
             function searchForm(value){
                 $.ontologyBrowser.bindClick(value);
             }
-
+			
+			/**
+			 * change the layout for the columns with value
+			 */
             function changeColumn(className, selected){
                 var column = $("."+className);
                 if (selected)
@@ -54,18 +59,33 @@
                     $(column).addClass("selected").removeClass("notSelected");
             }
             
+            /**
+             * send the paramiters for the other files
+             */
             function validation(getValue){
             	var tr = $('#ontology').children();
         		var values = new Array();	
             	for(var i=1; i<(tr.length+1); i++){
                     values.push($('#C'+i+'ontology').text());
             	}
-        		getValue += '&columnsValue='+values;
+            	if(!emptyArray(values))
+    				getValue += '&columnsValue='+values;
 
                 loading();
                 window.location = "annotation.php"+getValue;
             }
          	
+         	/**
+         	 * check if the array is empty
+         	 */
+         	function emptyArray(array){
+         		var empty=0;
+         		for(var i=0; i<array.length; i++){
+         			if(array[i].length==0)
+         				empty ++;
+         		}
+         		return (empty==array.length);
+         	}
          	/**
          	 * show how many ontologies find for all headers,
          	 * if is unique display the term finded
@@ -104,6 +124,9 @@
                 });
             }
             
+            /**
+             * display the loading 
+             */
             function loading(){
                 document.getElementById('working_area').style.opacity='0.4';
                 document.getElementById('loading').style.visibility='visible';

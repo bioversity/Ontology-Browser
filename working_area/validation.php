@@ -1,9 +1,9 @@
 <?php
-	
+/*	
 	// import the folder class
 	require_once 'folder/folder.php';
 	
-	$user = $_SESSION[kSESSION_USER]['_id'][':DATA'];
+	$user = $_SESSION[kSESSION_USER][kTAG_LID][kTAG_DATA];
 	$userFolder = new Folder($user);
 	
 	$dataset = $userFolder->getFolderDataset();
@@ -20,5 +20,21 @@
 			echo "</pre>";
 		}
 	}
+	
+*/	
+	
+	
+	$collection = new CappedCollection();
+	
+	$findForCurrentUser = array('user' => $_SESSION[kSESSION_USER][kTAG_LID][kTAG_DATA]);
+	
+	$msgs = $collection->find($findForCurrentUser);
 
+	foreach ($msgs as $msg) {
+	    echo $msg['msg']." ".$msg['time']."<br>";
+	}
+	
+	
+	
+	
 ?>

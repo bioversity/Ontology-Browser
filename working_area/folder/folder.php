@@ -7,15 +7,26 @@
 	 */
 
 	/**
-	 * import the folders name
-	 */ 
-	require_once 'defines/folder.inc.php';
- 
+	 * import defines
+	 */
+	require_once "working_area/defines/defines.inc.php";
+	/**
+	 * import store class
+	 */
+	require_once 'working_area/store/store.php';
+	// includes all library to read the files
+    require_once 'File_Excel/PHPExcel.php';
+    require_once 'File_Excel/PHPExcel/IOFactory.php';
+    require_once 'File_Excel/simplexlsx.class.php';
+	require_once "File_CSV/File_CSV/DataSource.php";	
+	
+	
 	class Folder{
 			
-		private static $path;
-		
 		private static $userFolder;
+		private $store;
+		private $dataset;
+		private $temporaryFolder;
 		
 		/**
 		 * construct for the class Folder;
@@ -23,16 +34,14 @@
 		 * @param	$folderName 	the user code, used to create the personal folder
 		 */		
 		public function __construct($folderName){
-			if(empty(self::$path)){
-				self::$path[folderTemporary] = folderUpload."/".$folderName."/".folderTemporary."/";
-				self::$path[folderDataset] = folderUpload."/".$folderName."/".folderDataset."/";
+			if(empty(self::$userFolder)){
 				self::$userFolder = folderUpload."/".$folderName."/";
 				self::init($folderName);
 			}
+			$this->store = new Store();
 		}
 		/**
-		 * create the folder for the current user, if not exist,
-		 * with the relative dataset and temporary folder, if not exist.
+		 * create the folder for the current user, if not exist
 		 * @param	$folderName		the user code used to  create the personal folder
 		 */
 		private function init($folderName){
@@ -41,48 +50,8 @@
 				mkdir(folderUpload."/".$folderName."/", 0777, true);
 	    		chmod(folderUpload."/".$folderName."/", 0777);
 			}
-			// create the folder temporary for the user if not exist
-			if(!file_exists(self::getFolderTemporary())){
-			 	mkdir(self::getFolderTemporary(), 0777, true);
-        		chmod(self::getFolderTemporary(), 0777);	
-			}
-			// create the folder dataset for the user if not exist
-			if(!file_exists(self::getFolderDataset())){
-				mkdir(self::getFolderDataset(), 0777, true);
-        		chmod(self::getFolderDataset(), 0777);
-			}
 		}
-		
-		/**
-		 * get the path for temporary and dataset folders.
-		 * @return	array 		the array with the path for both temporary and dataset folders
-		 */
-		public function getPath(){
-			return self::$path;
-		}
-		
-		/**
-		 * get the path of the temporary folder
-		 * @return	string		the temporary folder
-		 */
-		public function getFolderTemporary(){
-			return self::$path[folderTemporary];
-		}
-		
-		/**
-		 * get the path for the dataset folder
-		 * @return	string		the dataset folder
-		 */
-		public function getFolderDataset(){
-			return self::$path[folderDataset];	
-		}
-		/**
-		 * set the dataset folder
-		 * @param	$dataset		the dataset path
-		 */
-		public function setFolderDataset($dataset){
-			self::$path[folderDataset] = $dataset;
-		}
+
 		/**
 		 * get the user folder
 		 * @return	string		the user folder
@@ -90,27 +59,37 @@
 		public function getUserFolder(){
 			return self::$userFolder;
 		}
+		
 		/**
-		 * set the dataset from the name selected from the user, and if not exist create the relative folder
-		 * @param	$currentDatasetFolder		the name of the current dataset folder
+		 * set dataset name
+		 * @param	$dataset		the name of the dataset
 		 */
-		public function setCurrentDataset($currentDatasetFolder){
-			// create the subfolder in the dataset folder relative to the current dataset
-			if(!file_exists(self::getUserFolder().folderDataset."/".$currentDatasetFolder."/")){
-				mkdir(self::getUserFolder().folderDataset."/".$currentDatasetFolder."/", 0777, true);
-				chmod(self::getUserFolder().folderDataset."/".$currentDatasetFolder."/", 0777);
+		 public function setDataset($dataset){
+		 	$this->dataset = $dataset;
+		 }
+		
+		 /**
+		  * get the dataset name
+		  * @return	String			the dataset name
+		  */
+		 public function getDataset(){
+		 	return $this->dataset;
+		 }
+		
+		/**
+		 * set the temporary folder for the current dataset.
+		 * NOTE: the folder will be created with the same name of the dataset.
+		 * @param	$temporaryFolder		the name of the dataset selected for the imported file
+		 * 
+		 * @return 	folder					the current temporary folder
+		 */
+		public function setTemporaryFolder($temporaryFolder){
+			if(!file_exists(self::getUserFolder().$temporaryFolder."/")){
+				mkdir(self::getUserFolder().$temporaryFolder."/", 0777, true);
+				chmod(self::getUserFolder().$temporaryFolder."/", 0777);
 			}
-			self::$path[folderDataset] = self::getUserFolder().folderDataset."/".$currentDatasetFolder."/";
-		}
-		/**
-		 * set the current temporary folder, and if not exist create the relative folder
-		 * @param	$currentTemporaryFolder		the name of the current temporary folder
-		 */
-		public function setCurrentTemporary($currentTemporaryFolder){
-			// create the subfolder in the temporary folder relative to the current file
-			if(!file_exists(self::getUserFolder().folderTemporary."/".$currentTemporaryFolder."/"))
-				mkdir(self::getUserFolder().folderTemporary."/".$currentTemporaryFolder."/", 0777, true);	
-			self::$path[folderTemporary] = self::getUserFolder().folderTemporary."/".$currentTemporaryFolder."/";
+			$this->temporaryFolder = self::getUserFolder().$temporaryFolder."/";
+			return $this->temporaryFolder;
 		}
 		
 		/**
@@ -124,7 +103,7 @@
 	        while(false !== ($resource = readdir($handle))) {
 	            if(!in_array(strtolower($resource),$exempt)) {
 	                if(is_dir($directory.$resource.'/'))
-	                    array_merge($files, getFiles($directory.$resource.'/',$exempt,$files));
+	                    array_merge($files, $this->getFiles($directory.$resource.'/',$exempt,$files));
 	                else
 	                    $files[] = $resource;
 	            }
@@ -134,12 +113,13 @@
     	}
 		
 		/**
-		 * function used to read all files in the directory and create the 10 rows table in html format
+		 * print the 10 rows table from any file
 		 * @param	$dir	the directory to scan
-		 * @return	html	10 rows table with the content of each files
+		 * 
+		 * @return	boolean		TRUE, if the file is readed and the table was created. FALSE if there is no file
 		 */ 
-		public function doAnnotation($dir){
-	        $files = self::getFiles($dir);
+		public function doAnnotation($dir, $original=TRUE){
+	        $files = $this->getFiles($dir);
 	        if(empty($files)){              
 	            rmdir($dir);                								// remove empty folder
 	           	include 'noFile.html';										// print the noFile page
@@ -149,26 +129,27 @@
             $value = $files[0];												// get the first file in the folder
 			if(filesize($dir.$value)==0){									// check if file is empty
 				unlink($dir.$value);										
-				self::doAnnotation($dir);
+				$this->doAnnotation($dir);
 			}
 			else {
-				echo "<p>Analisys of <em>".(pathinfo($dir.$value, PATHINFO_FILENAME))."</em> file";
+				if($original)
+					echo "<p>Analisys of <em>".(pathinfo($dir.$value, PATHINFO_FILENAME))."</em> file<p>";
 	            switch (pathinfo($dir.$value, PATHINFO_EXTENSION)) {
 	                case "csv":                                       		// csv
 					case "txt":												// txt
-	                    echo self::readCSV($dir, $value);
+	                    echo $this->readCSV($dir, $value);
 	                    break;
 	                case "xls":                                         	// excel xls
-	                    self::readXLS($dir, $value);
+	                    $this->readXLS($dir, $value);
 	                    break;
 	                case "xlsx":                                         	// excel xlsx 
-	                    self::readXLSX($dir, $value);
+	                    $this->readXLSX($dir, $value);
 	                    break;
 	                default:                                            	// for all other file
 	                    if(is_file($dir.$value)){
-                       		copy($dir.$value, self::getFolderDataset()."/".$value);
+                       		$this->store->storeFile($dir.$value, array(DATASET=>$this->dataset, 'user'=>self::$userFolder));	
 	                        unlink($dir.$value);
-	                    	self::doAnnotation($dir);
+	                    	$this->doAnnotation($dir);
 	                    }
 	                    break;
 	            }
@@ -217,11 +198,11 @@
 	            fwrite($fileCsv, $testo);
 	            fclose($fileCsv);
 	        }
-	        copy($location.$file, self::getFolderDataset().$file);
+	        $this->store->storeFile($location.$file, array(DATASET=>$this->dataset, 'user'=>self::$userFolder));
 	        unlink($location.$file);
 	        unset($objReader);
 	        unset($objPHPExcel);
-	        self::doAnnotation($location);
+	        $this->doAnnotation($location, FALSE);
 	    }
 		
 		/**
@@ -240,10 +221,10 @@
 	            }
 	            fclose($fileCsv);
 	        }
-	        copy($location.$file, self::getFolderDataset().$file);
+			$this->store->storeFile($location.$file, array(DATASET=>$this->dataset, 'user'=>self::$userFolder));
 	        unlink($location.$file);
 	        unset($xlsx);
-	        self::doAnnotation($location);
+	        $this->doAnnotation($location, FALSE);
 	    }
 		
 		/**
@@ -265,7 +246,7 @@
 	            // import the csv file or die with the error in read csv
 	            $csv -> load($location.$file) or die('error in read csv');
 	            $return = '<p><input type="radio" name="valutation" value="passport" onClick="annotation();"/>passport';
-				$return .= '<input type="radio" name="valutation" value="attachment" onClick="validation(\'?attachment=1&temporary='.$location.'&dataset='.self::getFolderDataset().'&prevFile='.$file.'\');"/>attachment (skip file)</p>';
+				$return .= '<input type="radio" name="valutation" value="attachment" onClick="validation(\'?attachment=1&temporary='.$location.'&dataset='.$this->dataset.'&prevFile='.$file.'\');"/>attachment (skip file)</p>';
 	            $return .= "<table id='table1'><thead><tr id='user'>";
 	            // check if the file is comma or tab separated
 	            $countComma = count($csv->getHeaders());
@@ -305,7 +286,7 @@
 	                $i++;
 	            }
 	            $return .= "</tbody></table>";
-	            $return .= '<br><br><input id=\'submit\' type=\'submit\' name=\'submit\' value=\'Submit\' onClick="validation(\'?temporary='.$location.'&dataset='.self::getFolderDataset().'&prevFile='.$file.'&attachment=0\');" />';
+	            $return .= '<br><br><input id=\'submit\' type=\'submit\' name=\'submit\' value=\'Submit\' onClick="validation(\'?temporary='.$location.'&dataset='.$this->dataset.'&prevFile='.$file.'&attachment=0\');" />';
 	            ini_set("auto_detect_line_endings", $old);
 	            unset($csv);
 	            return $return;
@@ -325,7 +306,7 @@
 					if ($file != "." && $file != "..") {
 						if (is_dir($directory. "/" . $file)) {
 							if($recursive) {
-								$array_items = array_merge($array_items, self::fileList($directory. "/" . $file, $recursive));
+								$array_items = array_merge($array_items, $this->fileList($directory. "/" . $file, $recursive));
 							}
 							$file = $directory . "/" . $file;
 							if(is_file($file))
@@ -347,9 +328,15 @@
 		 * @return	array 		the array with the list of the dataset folders
 		 */
 		public function listDataset(){
-			$array = scandir(self::getFolderDataset());
-			$exclude = array('.','..','.DS_Store','.svn', '._.ds_store', '__macosx');
-			return array_values(array_diff($array, $exclude));
+			$datasetList = array();	
+			$files = $this->dataset->find();
+			foreach ($files as $currentFile) {
+				$dataset = $currentFile->file[DATASET];
+				if(!in_array($dataset, $datasetList)){
+					array_push($datasetList, $dataset);
+				}
+			}
+			return $datasetList;
 		}
 		
 		/**
@@ -360,7 +347,7 @@
 		public function rrmdir($dir) {
 		    foreach(glob($dir . '/*') as $file) {
 		        if(is_dir($file))
-		            self::rrmdir($file);
+		            $this->rrmdir($file);
 		        else
 		            unlink($file);
 		    }
@@ -373,7 +360,7 @@
 		 * @return	boolean		TRUE if it is empty, FALSE otherwise 
 		 */
 		public function isEmptyDir($dir){
-			$files = self::fileList($dir, true);	
+			$files = $this->fileList($dir, true);	
 			return empty($files);
 		}
 		
@@ -386,16 +373,5 @@
 			return pathinfo($directory, PATHINFO_DIRNAME);
 		}
 		
-		/**
-		 * create a file .properties contais the array with the selected value 
-		 * @param	$directory		the dataset folder 
-		 * @param	$file			the current file
-		 * @param	$contents		the array with the informations selected by the user
-		 */
-		 public function createProperties($directory, $file, $contents){
-		 	$fileProperties = fopen($directory.$file.'.properties', 'w');
-			fwrite($fileProperties, serialize($contents));
-            fclose($fileProperties);
-		 }
 	}
 ?>

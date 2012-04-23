@@ -1,4 +1,6 @@
 <?php
+	// import class store
+	require_once 'working_area/store/store.php';
 	// check if the user is logged
 	include 'working_area/logged.php';
 	//echo "<pre>"; print_r($_SESSION); echo "</pre>";
@@ -12,19 +14,26 @@
 
          <script>
          	
+         	/**
+         	 * check if the import fields are completed
+         	 */
      		function checkDataset(form){
-	     		if(form.file.value==''){
+     			console.log(form.dataset.value)
+	     		if(form.file.value==''){											// check if no file is selected
 	     			document.getElementById('working_area').style.opacity='1';
 	           		document.getElementById('loading').style.visibility='hidden';
 	     			return false;
 	     		}
-	     		if(form.dataset.value=="" || form.dasetOption.value==""){	
+	     		if(form.dataset.value=="" && form.datasetOption.value==""){			// check if the user not write any dataset or not select one already existing
 	     			document.getElementById('working_area').style.opacity='1';
 	           		document.getElementById('loading').style.visibility='hidden';
 	     			return false;
 	     		}
-	     		return true
+	     		return true															// if is all ok continue
      		}
+     		/**
+     		 * function used to display the loading image
+     		 */
          	function loading(){
 	            document.getElementById('working_area').style.opacity='0.4';
 	            document.getElementById('loading').style.visibility='visible';
@@ -46,13 +55,15 @@
                     <label for="dataset">Please choose the name of your dataset</label>
                     <input type="text" name="dataset" id="dataset">
                     	<?php
-                    		if(isset($_SESSION[kSESSION_USER]['oldDataset']) && !empty($_SESSION[kSESSION_USER]['oldDataset'])){
+                    		$store = new Store();
+							$datasetList = $store->datasetList($_SESSION[kSESSION_USER][kTAG_LID][kTAG_DATA]);
+							if(!empty($datasetList)){
                     	?>
 			                    <label> or choose one from older dataset</label>
 			                    <select id="datasetOption" name="datasetOption">
 			                   	<option value=""></option>
 		                <?php
-	                    		foreach ($_SESSION[kSESSION_USER]['oldDataset'] as $dataset) {
+	                    		foreach ($datasetList as $dataset) {
 									echo "<option value='$dataset'>$dataset</option>";
 								}
 							}
