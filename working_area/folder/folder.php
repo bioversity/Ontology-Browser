@@ -93,6 +93,15 @@
 		}
 		
 		/**
+		 * get temporary folder
+		 * 
+		 * @return	String		the temporary folder 
+		 */
+		public function getTemporaryFolder(){
+			return $this->temporaryFolder;
+		}
+		
+		/**
 		 * get all file in the directory
 		 * @param	$directory				the directory to scan
 		 * @param 	exempt		 			the array with the extension to exclude from the list
@@ -324,20 +333,24 @@
 		}
 		
 		/**
-		 * return the list of the dataset folders
-		 * @return	array 		the array with the list of the dataset folders
+		 * get all file stored in the dataset
+		 * @param	$dataset		the dataset to search in
+		 * 
+		 * @return	array 			the array with all files
 		 */
-		public function listDataset(){
-			$datasetList = array();	
-			$files = $this->dataset->find();
-			foreach ($files as $currentFile) {
-				$dataset = $currentFile->file[DATASET];
-				if(!in_array($dataset, $datasetList)){
-					array_push($datasetList, $dataset);
-				}
+		public function getFileInDataset($dataset){
+			$files = array();	
+			$collection = $this->store->db->selectCollection(FILECOLLECTION);
+			// filter for dataset
+			
+			$filter = $collection->find(array('dataset'=>$dataset));
+			foreach ($filter as $value) {
+				$file = str_replace(self::$userFolder.$dataset.'/', '', $value['filename']);
+				array_push($files, $file);
 			}
-			return $datasetList;
+			return $files;
 		}
+		
 		
 		/**
 		 * remove the folder 	example of path: folder1/folder2/
@@ -372,6 +385,6 @@
 		function toString($directory){
 			return pathinfo($directory, PATHINFO_DIRNAME);
 		}
-		
+
 	}
 ?>

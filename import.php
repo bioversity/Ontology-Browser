@@ -1,6 +1,7 @@
 <?php
-	// import class store
+	// import class
 	require_once 'working_area/store/store.php';
+	require_once 'working_area/folder/folder.php';
 	// check if the user is logged
 	include 'working_area/logged.php';
 	//echo "<pre>"; print_r($_SESSION); echo "</pre>";
@@ -51,33 +52,63 @@
             
             
             <div id='working_area'>
-                <form action="annotation.php" method="post" enctype="multipart/form-data" onsubmit="return checkDataset(this)">
-                    <label for="dataset">Please choose the name of your dataset</label>
-                    <input type="text" name="dataset" id="dataset">
-                    	<?php
-                    		$store = new Store();
-							$datasetList = $store->datasetList($_SESSION[kSESSION_USER][kTAG_LID][kTAG_DATA]);
-							if(!empty($datasetList)){
-                    	?>
-			                    <label> or choose one from older dataset</label>
-			                    <select id="datasetOption" name="datasetOption">
-			                   	<option value=""></option>
-		                <?php
-	                    		foreach ($datasetList as $dataset) {
-									echo "<option value='$dataset'>$dataset</option>";
+            	<p>In this page you can mangaer your file, decide if import new, continue your work with previous file imported and not yet evalauted, or have a view all files in the dataset</p>
+                <div id="importNewFile">
+                	<h3>Import new File</h3>
+	                <form action="annotation.php" method="post" enctype="multipart/form-data" onsubmit="return checkDataset(this)">
+	                    <label for="dataset">Please choose the name of your dataset</label>
+	                    <input type="text" name="dataset" id="dataset">
+	                    	<?php
+	                    		$store = new Store();
+								$datasetList = $store->datasetList($user->getID());
+								if(!empty($datasetList)){
+	                    	?>
+				                    <label> or choose one from older dataset</label>
+				                    <select id="datasetOption" name="datasetOption">
+				                   	<option value=""></option>
+			                <?php
+		                    		foreach ($datasetList as $dataset) {
+										echo "<option value='$dataset'>$dataset</option>";
+									}
 								}
-							}
-							else {
-								echo "<select name='datasetOption' style='visibility:hidden'>";
-							}
-                    	?>
-                    </select>
-                    <br /><br />
-                    <label for="file">File: </label>
-                    <input type="file" name="file" id="file" />
-                    <br /><br />
-                    <input type="submit" name="import" value="Import File"  onClick="loading();"/>
-                </form>
+								else {
+									echo "<select name='datasetOption' style='visibility:hidden'>";
+								}
+	                    	?>
+	                    </select>
+	                    <br /><br />
+	                    <label for="file">File: </label>
+	                    <input type="file" name="file" id="file" />
+	                    <br /><br />
+	                    <input type="submit" name="import" value="Import File"  onClick="loading();"/>
+	                </form>
+                </div>
+            	
+            	<div id="dataset">
+            		<h3>File stored in the dataset</h3>
+            		<?php
+            			$folder = new Folder($user->getID());
+						foreach ($datasetList as $dataset) {
+							$files[$dataset] = $folder->getFileInDataset($dataset);
+							echo "<pre>"; print_r($files); echo "</pre>";					
+						}
+					?>
+            	</div>
+            	
+            	<div id="temporary">
+            		<h3>File imported waiting for valutation</h3>
+            		<?php
+            			$temporary = $folder->fileList($folder->getUserFolder(), TRUE);
+            			foreach ($temporary as $fileTemp) {
+            				$temporaryPath = substr($fileTemp, 0, strrpos($fileTemp, '/')).'/';
+							$dataset = substr($temporaryPath, (strrpos($temporaryPath, '/',-2)+1));
+							$key = "<a href='annotation.php?temporary=$temporaryPath&dataset=$dataset'>$dataset</a>";
+							$tempFiles[$key][] = str_replace($temporaryPath, '', $fileTemp);
+						}	
+						echo "<pre>"; print_r($tempFiles); echo "</pre>";
+            		?>
+            	</div>
+            
             </div>
             <div id='loading' style="visibility: hidden"></div>
     </body>

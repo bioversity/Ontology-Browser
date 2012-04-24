@@ -35,7 +35,7 @@
 		$params->Operation( kAPI_OP_LOGIN );
 		$params->Format( kTYPE_JSON );
 		$params->Database( 'TEST' );
-		$params->Container( 'CWarehouseWrapper' );
+		$params->Container( CUser::DefaultContainer() );
 		$params->Options( kAPI_OPT_SAFE, TRUE );
 		$params->UserCode( $username );
 		$params->UserPass( $password );
@@ -60,7 +60,7 @@
 		$params[] = kAPI_OPT_USER_CODE.'='.$username;				// User code.
 		$params[] = kAPI_OPT_USER_PASS.'='.$password;				// User password.
 		$params[] = kAPI_DATABASE.'='.'TEST';						// Database.
-		$params[] = kAPI_CONTAINER.'='.'CWarehouseWrapper';			// Container.
+		$params[] = kAPI_CONTAINER.'='.CUser::DefaultContainer();	// Container.
 		$params[] = kAPI_OPT_LOG_TRACE.'='.'1';						// Trace exceptions.
 		$params[] = kAPI_OPT_LOG_REQUEST.'='.'1';					// Log request.
 		//

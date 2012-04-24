@@ -5,14 +5,15 @@
 	require_once '/Library/WebServer/Library/wrapper/defines/Operators.inc.php';
 	require_once '/Library/WebServer/Library/wrapper/defines/Offsets.inc.php';
 	
-	$mongo = new Mongo();
-	$db = $mongo->selectDB('TEST');
-	$collection = $db->selectCollection('CWarehouseWrapper');
+	$oldPassword = $_POST['oldPassword'];
+	$newPassword = $_POST['newPassword'];
+		
 	
-	$collection->update (	array(kOPERATOR_AND=>array(kTAG_CODE=> $_SESSION[kSESSION_USER][kTAG_CODE]), array(kOFFSET_PASSWORD=>$_POST['oldPassword'])), 
-							array('$set'=>array(kOFFSET_PASSWORD=>$_POST['newPassword'])) );
-	
-	
-	print_r($collection->findOne(array(kOPERATOR_AND=>array(kTAG_CODE=> $_SESSION[kSESSION_USER][kTAG_CODE]), array(kOFFSET_PASSWORD=>$_POST['oldPassword']))))	;	
-	//header('Location: ../user.php');
+	if($user->changePassword($oldPassword, $newPassword)){					// if the password is changed return on the user page
+		$_SESSION[kSESSION_USER][kOFFSET_PASSWORD] = $newPassword;
+		header('Location: ../user.php');
+	}
+	else {																	// if not return on the user page and print the error
+		header('Location: ../user.php?passwordError');
+	}
 ?>

@@ -31,6 +31,11 @@
 	 * define the default database for the Capped Collection
 	 */
 	 define("DATABASE", "TEST");
+	 
+	/**
+	 * define the collection for the user information
+	 */
+	define("USERCOLLECTION", "CWarehouseWrapper");
 	
 	/**
 	 * define the capped collection name

@@ -11,8 +11,8 @@
 		// import the capped collection class
 		require_once 'logMessage/cappedCollection.php';
 		
-		$user = $_SESSION[kSESSION_USER][kTAG_LID][kTAG_DATA];
-		$userFolder = new Folder($user);
+		$userID = $user->getID();
+		$userFolder = new Folder($userID);
 		$collection = new CappedCollection();
 		$store = new Store();
 		
@@ -30,10 +30,10 @@
 				// create the array with the metadata information
 				if(isset($_GET['columnsValue'])){																		// if the user selected the columns value
 					$columnsValue = array('columnsValue' => (explode(',', $_GET['columnsValue'])) );
-					$metadata = array_merge($columnsValue, array('user'=>$user, DATASET=>$userFolder->getDataset() ));
+					$metadata = array_merge($columnsValue, array('user'=>$userID, DATASET=>$userFolder->getDataset() ));
 				}
 				else {																									// else if selected nothing
-					$metadata = array('user'=>$user, DATASET=>$userFolder->getDataset());
+					$metadata = array('user'=>$userID, DATASET=>$userFolder->getDataset());
 				}
 				$store->storeFile($fileToStore, $metadata);
 	            unlink($_GET['temporary'].$_GET['prevFile']);													// delete the previus file from temporary folder
