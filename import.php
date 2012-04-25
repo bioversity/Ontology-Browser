@@ -5,6 +5,30 @@
 	// check if the user is logged
 	include 'working_area/logged.php';
 	//echo "<pre>"; print_r($_SESSION); echo "</pre>";
+	
+	$store = new Store();						// initialize the store object
+	$folder = new Folder($user->getID());		// initialize the folder object
+	
+	// remove the file in the dataset	
+	if(isset($_GET['removed'])){
+		$store->remove($_GET['removed']);
+		header('Location: import.php');
+	}
+	// remove entire dataset
+	if(isset($_GET['removedDataset'])){
+		$store->removeDataset($_GET['removedDataset']);
+		header('Location: import.php');
+	}
+	// remove the termporary file or folder
+	if(isset($_GET['removedFile'])){
+		if (file_exists($_GET['removedFile']) && is_dir($_GET['removedFile'])){
+			$folder->rrmdir($_GET['removedFile']);
+		}
+		elseif (file_exists($_GET['removedFile']) && is_file($_GET['removedFile'])) {
+			unlink($_GET['removedFile']);
+		}
+		header('Location: import.php');
+	}
 ?>
 	
 <html>
@@ -31,6 +55,13 @@
 	     			return false;
 	     		}
 	     		return true															// if is all ok continue
+     		}
+     		
+     		/**
+     		 * redirect onClick function
+     		 */
+     		function goToPage(link){
+     			window.location = link;
      		}
      		/**
      		 * function used to display the loading image
@@ -59,7 +90,6 @@
 	                    <label for="dataset">Please choose the name of your dataset</label>
 	                    <input type="text" name="dataset" id="dataset">
 	                    	<?php
-	                    		$store = new Store();
 								$datasetList = $store->datasetList($user->getID());
 								if(!empty($datasetList)){
 	                    	?>
@@ -85,27 +115,69 @@
                 </div>
             	
             	<div id="dataset">
-            		<h3>File stored in the dataset</h3>
             		<?php
-            			$folder = new Folder($user->getID());
+            			
+						$files = array();
 						foreach ($datasetList as $dataset) {
 							$files[$dataset] = $folder->getFileInDataset($dataset);
-							echo "<pre>"; print_r($files); echo "</pre>";					
+						}
+						
+						if(!empty($files)){
+					?>
+            				<h3>File stored in the dataset</h3>
+							<table id='datasetTable'>
+								<?php
+									foreach ($files as $key => $value) {
+										echo "<tr><th>$key</th><th></th>";												// create the header with the dataset name
+										echo "<th id='removeFolder' onClick='goToPage(\"import.php?removedDataset=$key\")'></th></tr>";
+										echo "<tr><td></td><td><table id='fileDatasetTable'>";							// create the table with all files in the dataset
+										foreach ($value as $fileInDataset) {
+											$fileInDatasetName = str_replace($folder->getUserFolder().$key.'/', '', $fileInDataset);
+											echo "<tr><td>$fileInDatasetName</td>";										// create the row with the file
+											echo "<td id='remove' onClick='goToPage(\"import.php?removed=$fileInDataset\")'></td></tr>";
+										}	
+										echo "</table></td></tr>";														// close the files table
+									}
+								?>
+							</table>
+							
+					<?php
 						}
 					?>
             	</div>
             	
             	<div id="temporary">
-            		<h3>File imported waiting for valutation</h3>
             		<?php
             			$temporary = $folder->fileList($folder->getUserFolder(), TRUE);
+            			$tempFiles = array();
             			foreach ($temporary as $fileTemp) {
             				$temporaryPath = substr($fileTemp, 0, strrpos($fileTemp, '/')).'/';
-							$dataset = substr($temporaryPath, (strrpos($temporaryPath, '/',-2)+1));
-							$key = "<a href='annotation.php?temporary=$temporaryPath&dataset=$dataset'>$dataset</a>";
-							$tempFiles[$key][] = str_replace($temporaryPath, '', $fileTemp);
+							$tempFiles[$temporaryPath][] = $fileTemp;
 						}	
-						echo "<pre>"; print_r($tempFiles); echo "</pre>";
+
+						if (!empty($tempFiles)){
+					?>
+							<h3>File imported waiting for valutation</h3>
+							<table id='temporaryTable'>
+								<?php
+									foreach ($tempFiles as $key => $value) {
+			            				$temporaryPath = substr($key, 0, strrpos($key, '/')).'/';
+										$dataset = substr($temporaryPath, (strrpos($temporaryPath, '/',-2)+1),-1);
+										$edit = "<th id=\"edit\" onClick='goToPage(\"annotation.php?temporary=$temporaryPath&dataset=$dataset\")'><th>";
+										echo "<tr>$edit<th>$dataset</th><th></th>";															// create the header with the dataset name
+										echo "<th id='removeFolder' onClick='goToPage(\"import.php?removedFile=$key\")'></th></tr>";
+										echo "<tr><td></td><td></td><td></td><td><table id='fileTemporaryTable'>";							// create the table with all files in the dataset
+										foreach ($value as $fileInTemporary) {
+											$fileInTemporaryName = str_replace($temporaryPath, '', $fileInTemporary);
+											echo "<tr><td>$fileInTemporaryName</td>";												// create the row with the file
+											echo "<td id='remove' onClick='goToPage(\"import.php?removedFile=$fileInTemporary\")'></td></tr>";
+										}	
+										echo "</table></td></tr>";																	// close the files table
+									}
+								?>
+							</table>
+					<?php
+						}
             		?>
             	</div>
             

@@ -27,16 +27,18 @@
 		private $store;
 		private $dataset;
 		private $temporaryFolder;
+		private $user;
 		
 		/**
 		 * construct for the class Folder;
 		 * initialize the path array with the temporary and dataset folders
 		 * @param	$folderName 	the user code, used to create the personal folder
 		 */		
-		public function __construct($folderName){
+		public function __construct($userCode){
 			if(empty(self::$userFolder)){
-				self::$userFolder = folderUpload."/".$folderName."/";
-				self::init($folderName);
+				self::$userFolder = folderUpload."/".$userCode."/";
+				$this->user = $userCode;
+				self::init($userCode);
 			}
 			$this->store = new Store();
 		}
@@ -123,7 +125,8 @@
 		
 		/**
 		 * print the 10 rows table from any file
-		 * @param	$dir	the directory to scan
+		 * @param	$dir		the directory to scan
+		 * @param	$original	check if the file is not created by the system
 		 * 
 		 * @return	boolean		TRUE, if the file is readed and the table was created. FALSE if there is no file
 		 */ 
@@ -146,7 +149,7 @@
 	            switch (pathinfo($dir.$value, PATHINFO_EXTENSION)) {
 	                case "csv":                                       		// csv
 					case "txt":												// txt
-	                    echo $this->readCSV($dir, $value);
+	                    echo $this->readCSV($dir, $value, $original);
 	                    break;
 	                case "xls":                                         	// excel xls
 	                    $this->readXLS($dir, $value);
@@ -156,7 +159,7 @@
 	                    break;
 	                default:                                            	// for all other file
 	                    if(is_file($dir.$value)){
-                       		$this->store->storeFile($dir.$value, array(DATASET=>$this->dataset, 'user'=>self::$userFolder));	
+                       		$this->store->storeFile($dir.$value, array(DATASET=>$this->dataset, iCOLLECTIONUSER=>$this->user));	
 	                        unlink($dir.$value);
 	                    	$this->doAnnotation($dir);
 	                    }
@@ -207,7 +210,7 @@
 	            fwrite($fileCsv, $testo);
 	            fclose($fileCsv);
 	        }
-	        $this->store->storeFile($location.$file, array(DATASET=>$this->dataset, 'user'=>self::$userFolder));
+	        $this->store->storeFile($location.$file, array(DATASET=>$this->dataset, iCOLLECTIONUSER=>$this->user, iORIGINAL=>TRUE));
 	        unlink($location.$file);
 	        unset($objReader);
 	        unset($objPHPExcel);
@@ -230,7 +233,7 @@
 	            }
 	            fclose($fileCsv);
 	        }
-			$this->store->storeFile($location.$file, array(DATASET=>$this->dataset, 'user'=>self::$userFolder));
+			$this->store->storeFile($location.$file, array(DATASET=>$this->dataset, iCOLLECTIONUSER=>$this->user, iORIGINAL=>TRUE));
 	        unlink($location.$file);
 	        unset($xlsx);
 	        $this->doAnnotation($location, FALSE);
@@ -240,6 +243,7 @@
 		 * function used to read the CSV files contenuted in the temporary folder
 		 * @param	$location		the current temporary folder
 		 * @param	$file			the current file to read
+		 * @param	$original		check if the file is the original or is created by the sistem
 		 * @return	html			10 rows table with the content of the file
 		 */
 		function readCSV($location, $file){
@@ -345,8 +349,8 @@
 			
 			$filter = $collection->find(array('dataset'=>$dataset));
 			foreach ($filter as $value) {
-				$file = str_replace(self::$userFolder.$dataset.'/', '', $value['filename']);
-				array_push($files, $file);
+				//$file = str_replace(self::$userFolder.$dataset.'/', '', $value['filename']);
+				array_push($files, $value['filename']);
 			}
 			return $files;
 		}

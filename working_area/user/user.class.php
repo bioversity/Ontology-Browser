@@ -1,5 +1,5 @@
 <?php
- 	/**
+	/**
 	 * This file contain the User Class.
 	 * Used to create an user and all operation related to him
 	 * 
@@ -7,13 +7,10 @@
 	 * @version 1.0 19/04/2012
 	 */
 	 
-	 /**
-	  * import defines for user 
-	  */
+	/**
+	 * import defines for user 
+	 */
 	require_once( '/Library/WebServer/Library/wrapper/includes.inc.php' );
-	require_once( kPATH_LIBRARY_DEFINES."Session.inc.php" );
-	require_once( kPATH_LIBRARY_DEFINES."Offsets.inc.php" );
-	require_once( kPATH_LIBRARY_DEFINES."Operators.inc.php" );
 	
 	class User extends CUser{
 		
@@ -23,7 +20,7 @@
 		private $password;
 		private $email;
 		private $id;
-		
+		private $version;
 		// user class
 		private $user;
 		// database 
@@ -34,20 +31,27 @@
 		
 		/**
 		 * construct for the User class
-		 * @param	@userInformation	array contents all information for the user
+		 * @param	$userArray	the array contains User Code, User ID and User Version informations
 		 */
-		public function __construct($userInformation){
-			// inizialyze user variable
-			$this->name = $userInformation[kTAG_NAME];
-			$this->code = $userInformation[kTAG_CODE];
-			$this->password = $userInformation[kOFFSET_PASSWORD];
-			$this->email = $userInformation[kOFFSET_EMAIL];
-			$this->id=$userInformation[kTAG_LID][kTAG_DATA];
-			
+		public function __construct($userArray){
+			// initialize the database connection
 			$this->mongo = new Mongo();
 			$this->db = $this->mongo->selectDB( "TEST" );
 			$this->collection = new CMongoContainer( $this->db->selectCollection( CUser::DefaultContainer() ) );
 			
+			// find the user information
+			$userCollection = $this->collection->Container();
+			$userInformation = $userCollection->findOne(array(kTAG_CODE => $userArray[kTAG_CODE]));
+
+			// initialize user variable
+			$this->name = $userInformation[kTAG_NAME];
+			$this->code = $userInformation[kTAG_CODE];
+			$this->password = $userInformation[kOFFSET_PASSWORD];
+			$this->email = $userInformation[kOFFSET_EMAIL];
+			$this->id = $userArray[kTAG_LID];
+			$this->version = $userInformation[kTAG_VERSION];
+			
+			// initialize the CUser object
 			$this->user = new CUser($userInformation);
 		}
 		
@@ -82,6 +86,14 @@
 		public function getID(){
 			return $this->id;
 		} 
+		
+		/**
+		 * get user version
+		 * @return	int		the user version
+		 */
+		public function getVersione(){
+			return $this->version;
+		}
 		
 		/**
 		 * set the user name
@@ -146,7 +158,8 @@
 		public function toString(){
 			$str = "NAME: ".$this->name."\n";
 			$str .= "EMAIL: ".$this->email."\n";
-			$str .= "PASSWORD: ".$this->password;
+			$str .= "PASSWORD: ".$this->password."\n";
+			$str .= "ID: ".$this->id;
 			
 			return $str;
 		} 

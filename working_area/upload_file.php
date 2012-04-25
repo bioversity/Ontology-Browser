@@ -36,8 +36,15 @@
 					$metadata = array('user'=>$userID, DATASET=>$userFolder->getDataset());
 				}
 				$store->storeFile($fileToStore, $metadata);
+				// check if the file imported is the original or the copy created by system
+				if(( strpos($fileToStore, '.xls') || strpos($fileToStore, '.xlsx') ) && strpos($fileToStore, '.csv') ){
+					$store->updateFile($fileToStore, array(iORIGINAL=>FALSE));
+				}
+				else {
+					$store->updateFile($fileToStore, array(iORIGINAL=>TRUE));
+				}
 	            unlink($_GET['temporary'].$_GET['prevFile']);													// delete the previus file from temporary folder
-            	$collection->insert(array(iCOLLECTIONUSER=>$_SESSION[kSESSION_USER][kTAG_LID][kTAG_DATA], iMESSAGE=>$_GET['prevFile']." ".iCOMPLETED, iTIME=> iCURRENTDATE));
+            	$collection->insert(array(iCOLLECTIONUSER=>$userID, iMESSAGE=>$_GET['prevFile']." ".iCOMPLETED, iTIME=> iCURRENTDATE));
 			}
             
 			$userFolder->doAnnotation($_GET['temporary']);
@@ -45,6 +52,7 @@
 		else {																// if not exist
 			include 'folder/noFile.html';					
 		}
+
     }
     else{
 		$dataset = (!empty($_POST['datasetOption'])) ? $_POST['datasetOption'] : $_POST['dataset'];
@@ -77,7 +85,7 @@
 	            move_uploaded_file($_FILES["file"]["tmp_name"], $dir.$_FILES["file"]["name"]);
 	            break;
 	    }
-		$collection->insert(array(iCOLLECTIONUSER=>$_SESSION[kSESSION_USER][kTAG_LID][kTAG_DATA], iMESSAGE=>$_FILES["file"]["name"]." ".iIMPORTED, iTIME=> iCURRENTDATE));
+		$collection->insert(array(iCOLLECTIONUSER=>$userID, iMESSAGE=>$_FILES["file"]["name"]." ".iIMPORTED, iTIME=> iCURRENTDATE));
 		$userFolder->doAnnotation($dir);
 	}
  

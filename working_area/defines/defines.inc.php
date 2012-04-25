@@ -78,6 +78,11 @@
 	   * type of date
 	   */
 	   define('iCURRENTDATE',date('d-M-Y H:i:s + e'));
+	   /**
+	    * original file
+	    */
+	   define('iORIGINAL', 'original');
+	   
 	
 
 ?>

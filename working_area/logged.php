@@ -23,7 +23,8 @@
 		header("Location: index.php");
 		exit;
 	}
-	else {
+	// create the user with the information saved in session, for more info have a look to working_area/user/user.class.php
+	else {												
 		$user = new User($_SESSION[kSESSION_USER]);
 	}
 ?>

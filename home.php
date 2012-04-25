@@ -4,7 +4,7 @@
 	// check if the user is logged
 	include 'working_area/logged.php';
 
-//	echo "<pre>"; print_r($_SERVER); echo "</pre>";
+//	echo "<pre>"; print_r($_SESSION); echo "</pre>";
 	
 ?>
 <html>
@@ -47,8 +47,8 @@
                 		<?php
 							}
 						?>
-                		<p>Insert your new password		<input type="password" name="newPassword" /></p>
-                		<p>Confirm your new password	<input type="password" name="confirmPassword" /></p>
+                		<p>Insert new password		<input type="password" name="newPassword" /></p>
+                		<p>Confirm new password	<input type="password" name="confirmPassword" /></p>
                 		<input type="submit" name="changePassword" value="Change password"  />
                 	</form>
             	</div>

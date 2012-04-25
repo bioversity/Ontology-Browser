@@ -30,6 +30,7 @@
 		
 		/**
 		 * override the method storeFile, forcing the safe value
+		 * if the file already exist in the selected dataset, will override the file and the metadata information
 		 * @param	$filename			the name of the file
 		 * @param	$metadata			other metadata to add to the file saved
 		 * @param	$option				Options for the store. Use "safe" to check that this store succeeded.
@@ -39,7 +40,46 @@
 		public function storeFile($filename, $metadata=array(), $option=array() ){
 			try{
 				$optionSafe = array_merge(array('safe'=>TRUE), $option);	
-				parent::storeFile($filename, $metadata, $optionSafe);		
+				$oldFile = parent::findOne($filename);				
+				if($oldFile == NULL){
+					parent::storeFile($filename, $metadata, $optionSafe);		
+				}
+				else {
+					parent::delete($oldFile->file[kTAG_LID]);
+					parent::storeFile($filename, $metadata, $optionSafe);
+				}
+			}
+			catch (MongoCursorException $error){
+				echo "error message: ".$e->getMessage()."\n";
+   				echo "error code: ".$e->getCode()."\n";
+			}	
+		}
+		
+		/**
+		 * remove the file selected
+		 * @param	$filename		the file to remove
+		 * 
+		 * @return	boolean			if the removal was successfully sent to the database
+		 */
+		public function remove($filename){
+			try{
+				parent::remove(array('filename'=>$filename), array('safe'=>TRUE));
+			}
+			catch (MongoCursorException $error){
+				echo "error message: ".$e->getMessage()."\n";
+   				echo "error code: ".$e->getCode()."\n";
+			}	
+		}
+		
+		/**
+		 * remove the file selected
+		 * @param	$datasetName		the file to remove
+		 * 
+		 * @return	boolean				if the removal was successfully sent to the database
+		 */
+		public function removeDataset($datasetName){
+			try{
+				parent::remove(array(DATASET=>$datasetName), array('safe'=>TRUE));
 			}
 			catch (MongoCursorException $error){
 				echo "error message: ".$e->getMessage()."\n";

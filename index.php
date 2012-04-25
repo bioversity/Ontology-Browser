@@ -27,7 +27,7 @@
             		session_start();
 					// check if the user is logged, if true redirect to the user profile page
 					if((isset($_SESSION[kSESSION_USER])))
-						header("Location: user.php");
+						header("Location: home.php");
 					else {
 
             	?>

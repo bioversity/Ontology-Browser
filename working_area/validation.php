@@ -26,7 +26,7 @@
 	
 	$collection = new CappedCollection();
 	
-	$findForCurrentUser = array('user' => $_SESSION[kSESSION_USER][kTAG_LID][kTAG_DATA]);
+	$findForCurrentUser = array('user' => $user->getID());
 	
 	$msgs = $collection->find($findForCurrentUser);
 

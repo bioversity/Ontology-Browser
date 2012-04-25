@@ -91,3 +91,30 @@ th{
 .glt-elm img{
 	display: block;
 }
+
+
+
+#edit{
+	width: 30px;
+	height: 30px;
+	background:url('../images/icons/edit.png');
+	background-size:30px 30px;
+	background-repeat:no-repeat;
+	cursor: pointer;
+}
+#removeFolder{
+	width: 30px;
+	height: 30px;
+	background: url('../images/icons/folder-delete.png');
+	background-size:30px 30px;
+	background-repeat:no-repeat;
+	cursor: pointer;
+}
+#remove{
+	width: 30px;
+	height: 30px;
+	background: url('../images/icons/file-delete.png');
+	background-size:30px 30px;
+	background-repeat:no-repeat;
+	cursor: pointer;
+}

@@ -9,10 +9,7 @@
 	//
 	require_once( kPATH_LIBRARY_SOURCE."CMongoQuery.php" );
 	require_once( kPATH_LIBRARY_SOURCE."CWarehouseWrapperClient.php" );
-	require_once( kPATH_LIBRARY_SOURCE."CMongoDataWrapper.inc.php" );
-	require_once( kPATH_LIBRARY_DEFINES."Session.inc.php" );
-	require_once( kPATH_LIBRARY_DEFINES."Offsets.inc.php" );
-	require_once( kPATH_LIBRARY_SOURCE."CWrapper.inc.php" );
+
 	
 	//
 	// Use raw parameters or use wrapper client?.
@@ -45,6 +42,7 @@
 		// Get response.
 		//
 		$decoded = $params->Execute();
+		
 	}
 	//
 	// Use raw parameters.
@@ -77,15 +75,17 @@
 		$decoded = json_decode( $response, TRUE );
 	}
 	
-	echo "<pre>";
-	print_r($decoded);
-	echo "</pre>";
+//	echo "<pre>";
+//	print_r($decoded);
+//	echo "</pre>";
 	
 	session_start();	
 	if( $decoded[kAPI_DATA_STATUS][kTAG_STATUS]==0 && $decoded[kAPI_DATA_STATUS][kAPI_AFFECTED_COUNT]==1 ){
-		$_SESSION[kSESSION_USER] = $decoded[kAPI_DATA_RESPONSE];
+		$_SESSION[kSESSION_USER][kTAG_CODE] = $decoded[kAPI_DATA_RESPONSE][kTAG_CODE];						// USER CODE
+		$_SESSION[kSESSION_USER][kTAG_LID] = $decoded[kAPI_DATA_RESPONSE][kTAG_LID][kTAG_DATA];				// USER ID
+		$_SESSION[kSESSION_USER][kTAG_VERSION] = $decoded[kAPI_DATA_RESPONSE][kTAG_VERSION];				// USER CURRENT VERSION
 	}
 
-	header('Location: ../user.php');
+	header('Location: ../home.php');
 	
 ?>
