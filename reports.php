@@ -1,12 +1,6 @@
 <?php
-	//import capped class
-	require_once 'working_area/logMessage/cappedCollection.php';
-	// include store class
-	require_once 'working_area/store/store.php';
-	
 	// check if the user is logged
 	include_once 'working_area/logged.php';
-	
 ?>
 <html>
     <head>
@@ -24,7 +18,7 @@
             
             <div id='working_area'>
                 <?php
-			   		include 'working_area/validation.php';
+			   		include 'working_area/reports.php';
                 ?>
             </div>
             <div id='loading' style="visibility: hidden"></div>
