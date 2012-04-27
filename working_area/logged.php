@@ -13,8 +13,11 @@
 	//
 	// Class User include
 	//
-	require_once 'user/user.class.php';
 	require_once 'defines/defines.inc.php';
+	require_once 'user/user.class.php';
+	require_once 'logMessage/cappedCollection.php';
+	require_once 'store/store.php';	
+	require_once 'folder/folder.php';
 	
 	session_start();
 	
@@ -23,8 +26,11 @@
 		header("Location: index.php");
 		exit;
 	}
-	// create the user with the information saved in session, for more info have a look to working_area/user/user.class.php
+	// inizialyze variable for user, store, folder and cappedCollection objects
 	else {												
 		$user = new User($_SESSION[kSESSION_USER]);
+		$store = new Store();
+		$folder = new Folder($user->getID());
+		$cappedCollection = new CappedCollection();
 	}
 ?>

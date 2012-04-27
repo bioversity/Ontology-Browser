@@ -50,8 +50,8 @@
 				}
 			}
 			catch (MongoCursorException $error){
-				echo "error message: ".$e->getMessage()."\n";
-   				echo "error code: ".$e->getCode()."\n";
+				echo "error message: ".$error->getMessage()."\n";
+   				echo "error code: ".$error->getCode()."\n";
 			}	
 		}
 		
@@ -63,11 +63,11 @@
 		 */
 		public function remove($filename){
 			try{
-				parent::remove(array('filename'=>$filename), array('safe'=>TRUE));
+				parent::remove(array('filename'=> array('$regex' => $filename)), array('safe'=>TRUE));
 			}
 			catch (MongoCursorException $error){
-				echo "error message: ".$e->getMessage()."\n";
-   				echo "error code: ".$e->getCode()."\n";
+				echo "error message: ".$error->getMessage()."\n";
+   				echo "error code: ".$error->getCode()."\n";
 			}	
 		}
 		
@@ -82,8 +82,8 @@
 				parent::remove(array(DATASET=>$datasetName), array('safe'=>TRUE));
 			}
 			catch (MongoCursorException $error){
-				echo "error message: ".$e->getMessage()."\n";
-   				echo "error code: ".$e->getCode()."\n";
+				echo "error message: ".$error->getMessage()."\n";
+   				echo "error code: ".$error->getCode()."\n";
 			}	
 		}
 		
@@ -123,8 +123,9 @@
 			// filter for user
 			$filter = $collection->find(array("user"=>$user));
 			foreach ($filter as $value) {
-				if(!in_array($value[DATASET], $datasetList))
+				if(!in_array($value[DATASET], $datasetList)){
 					array_push($datasetList, $value[DATASET]);
+				}
 			}
 			return $datasetList;
 		} 

@@ -27,7 +27,7 @@
 		private $store;
 		private $dataset;
 		private $temporaryFolder;
-		private $user;
+		private static $user;
 		
 		/**
 		 * construct for the class Folder;
@@ -37,7 +37,7 @@
 		public function __construct($userCode){
 			if(empty(self::$userFolder)){
 				self::$userFolder = folderUpload."/".$userCode."/";
-				$this->user = $userCode;
+				self::$user = $userCode;
 				self::init($userCode);
 			}
 			$this->store = new Store();
@@ -77,6 +77,14 @@
 		 public function getDataset(){
 		 	return $this->dataset;
 		 }
+		 
+		 /**
+		  * return the user name
+		  * @return String			the user name
+		  */
+		public function getUserName(){
+			return self::$user;
+		}
 		
 		/**
 		 * set the temporary folder for the current dataset.
@@ -159,7 +167,7 @@
 	                    break;
 	                default:                                            	// for all other file
 	                    if(is_file($dir.$value)){
-                       		$this->store->storeFile($dir.$value, array(DATASET=>$this->dataset, iCOLLECTIONUSER=>$this->user));	
+                       		$this->store->storeFile($dir.$value, array(DATASET=>$this->dataset, iCOLLECTIONUSER=>self::getUserName()));	
 	                        unlink($dir.$value);
 	                    	$this->doAnnotation($dir);
 	                    }
@@ -210,7 +218,7 @@
 	            fwrite($fileCsv, $testo);
 	            fclose($fileCsv);
 	        }
-	        $this->store->storeFile($location.$file, array(DATASET=>$this->dataset, iCOLLECTIONUSER=>$this->user, iORIGINAL=>TRUE));
+	        $this->store->storeFile($location.$file, array(DATASET=>$this->dataset, iCOLLECTIONUSER=>self::getUserName(), iORIGINAL=>TRUE));
 	        unlink($location.$file);
 	        unset($objReader);
 	        unset($objPHPExcel);
@@ -233,7 +241,7 @@
 	            }
 	            fclose($fileCsv);
 	        }
-			$this->store->storeFile($location.$file, array(DATASET=>$this->dataset, iCOLLECTIONUSER=>$this->user, iORIGINAL=>TRUE));
+			$this->store->storeFile($location.$file, array(DATASET=>$this->dataset, iCOLLECTIONUSER=>self::getUserName(), iORIGINAL=>TRUE));
 	        unlink($location.$file);
 	        unset($xlsx);
 	        $this->doAnnotation($location, FALSE);
@@ -379,6 +387,19 @@
 		public function isEmptyDir($dir){
 			$files = $this->fileList($dir, true);	
 			return empty($files);
+		}
+		
+		/**
+		 * check if the user get all allow space
+		 * @return	Boolean		TRUE, if the user uses all allow space, FALSE otherwise
+		 */
+		public function isFull(){
+			$files = self::fileList(self::$userFolder, TRUE);
+			$occupatedSpace = 0;
+			foreach ($files as $file) {
+				$occupatedSpace += filesize($file);
+			}
+			return $occupatedSpace>=fMAXSPACE;
 		}
 		
 		/**

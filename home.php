@@ -29,7 +29,7 @@
             
             
             <div id='working_area'>
-            	<?php echo $user->toString(); ?>
+            	<?php //echo $user->toString(); ?>
             	<p>Welcome <em><?php echo $user->getName(); ?></em> (<?php echo $user->getEmail(); ?>)</p>
             	<p>In this page you can edit your contanct information</p>
                 

@@ -21,6 +21,11 @@
 	define('folderTemporary', "temporary");
 	
 	/**
+	 * define the max space for user, in bytes
+	 */
+	define('fMAXSPACE', 10);
+	
+	/**
 	 * define the folder name for the dataset files,
 	 * all files after have been analysed are moved into this folder
 	 */
@@ -70,6 +75,7 @@
 	  define('iCOMPLETED', 'completed');
 	  define('iIMPORTED', 'imported');
 	  define('iFAILED', 'failed');
+	  define('iREMOVED', 'removed');
 	  /**
 	   * time
 	   */

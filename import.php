@@ -1,22 +1,36 @@
 <?php
-	// import class
-	require_once 'working_area/store/store.php';
-	require_once 'working_area/folder/folder.php';
+
 	// check if the user is logged
-	include 'working_area/logged.php';
+	require_once 'working_area/logged.php';
 	//echo "<pre>"; print_r($_SESSION); echo "</pre>";
-	
-	$store = new Store();						// initialize the store object
-	$folder = new Folder($user->getID());		// initialize the folder object
 	
 	// remove the file in the dataset	
 	if(isset($_GET['removed'])){
 		$store->remove($_GET['removed']);
-		header('Location: import.php');
+		// remove all file created by the excel
+		$filesTemporary = $folder->fileList($folder->getUserFolder(), TRUE);
+		foreach ($filesTemporary as $fileTemporary) {
+			$fileTemporaryName = pathinfo($fileTemporary, PATHINFO_DIRNAME)."/".pathinfo($fileTemporary, PATHINFO_BASENAME);
+			if(!(strpos($fileTemporaryName, $_GET['removed'])===FALSE)){
+				unlink($fileTemporary);
+			}
+		}
+		$fileName = str_replace($folder->getUserFolder(), '', $_GET['removed']);
+		$cappedCollection->insert(array(iCOLLECTIONUSER=>$user->getID(), iMESSAGE=>$fileName." ".iREMOVED, iTIME=> iCURRENTDATE));
+//		header('Location: import.php');
 	}
 	// remove entire dataset
 	if(isset($_GET['removedDataset'])){
 		$store->removeDataset($_GET['removedDataset']);
+		// remove all files created by the excel
+		$filesTemporary = $folder->fileList($folder->getUserFolder(), TRUE);
+		foreach ($filesTemporary as $fileTemporary) {
+			$fileTemporaryName = pathinfo($fileTemporary, PATHINFO_DIRNAME)."/".pathinfo($fileTemporary, PATHINFO_BASENAME);
+			if(!(strpos($fileTemporaryName, '.csv')===FALSE && (strpos($fileTemporaryName, '.xls')===FALSE || strpos($fileTemporaryName, '.xlsx')===FALSE)) ){
+				unlink($fileTemporary);
+			}
+		}
+		$cappedCollection->insert(array(iCOLLECTIONUSER=>$user->getID(), iMESSAGE=>$_GET['removedDataset']." dataset ".iREMOVED, iTIME=> iCURRENTDATE));
 		header('Location: import.php');
 	}
 	// remove the termporary file or folder
@@ -86,32 +100,43 @@
             	<p>In this page you can mangaer your file, decide if import new, continue your work with previous file imported and not yet evalauted, or have a view all files in the dataset</p>
                 <div id="importNewFile">
                 	<h3>Import new File</h3>
-	                <form action="annotation.php" method="post" enctype="multipart/form-data" onsubmit="return checkDataset(this)">
-	                    <label for="dataset">Please choose the name of your dataset</label>
-	                    <input type="text" name="dataset" id="dataset">
-	                    	<?php
-								$datasetList = $store->datasetList($user->getID());
-								if(!empty($datasetList)){
-	                    	?>
-				                    <label> or choose one from older dataset</label>
-				                    <select id="datasetOption" name="datasetOption">
-				                   	<option value=""></option>
-			                <?php
-		                    		foreach ($datasetList as $dataset) {
-										echo "<option value='$dataset'>$dataset</option>";
+                	<?php
+                			// get the dataset List
+							$datasetList = $store->datasetList($user->getID());
+                		
+                			if(!$folder->isFull()){
+                	?>
+		                <form action="annotation.php" method="post" enctype="multipart/form-data" onsubmit="return checkDataset(this)">
+		                    <label for="dataset">Please choose the name of your dataset</label>
+		                    <input type="text" name="dataset" id="dataset">
+		                    	<?php
+									if(!empty($datasetList)){
+		                    	?>
+					                    <label> or choose one from older dataset</label>
+					                    <select id="datasetOption" name="datasetOption">
+					                   	<option value=""></option>
+				                <?php
+			                    		foreach ($datasetList as $dataset) {
+											echo "<option value='$dataset'>$dataset</option>";
+										}
 									}
-								}
-								else {
-									echo "<select name='datasetOption' style='visibility:hidden'>";
-								}
-	                    	?>
-	                    </select>
-	                    <br /><br />
-	                    <label for="file">File: </label>
-	                    <input type="file" name="file" id="file" />
-	                    <br /><br />
-	                    <input type="submit" name="import" value="Import File"  onClick="loading();"/>
-	                </form>
+									else {
+										echo "<select name='datasetOption' style='visibility:hidden'>";
+									}
+		                    	?>
+		                    </select>
+		                    <br /><br />
+		                    <label for="file">File: </label>
+		                    <input type="file" name="file" id="file" />
+		                    <br /><br />
+		                    <input type="submit" name="import" value="Import File"  onClick="loading();"/>
+		                </form>
+		            <?php
+	            		}   
+	            		else {
+							echo "<p>Allow space is full, please analyze your files before import others";
+						} 
+	                ?>
                 </div>
             	
             	<div id="dataset">
@@ -121,7 +146,6 @@
 						foreach ($datasetList as $dataset) {
 							$files[$dataset] = $folder->getFileInDataset($dataset);
 						}
-						
 						if(!empty($files)){
 					?>
             				<h3>File stored in the dataset</h3>

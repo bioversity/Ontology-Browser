@@ -1,6 +1,4 @@
 <?php
-	// include store class to store the file into MongoDB
-	require_once 'working_area/store/store.php';
 	// check if the user is logged
 	include 'working_area/logged.php';
 	
@@ -66,7 +64,9 @@
             	var tr = $('#ontology').children();
         		var values = new Array();	
             	for(var i=1; i<(tr.length+1); i++){
-                    values.push($('#C'+i+'ontology').text());
+            		var string = $('#C'+i+'ontology').text();
+                    string = string.slice(string.indexOf('[')+1,string.indexOf(']'));
+                    values.push(string);
             	}
             	if(!emptyArray(values))
     				getValue += '&columnsValue='+values;
