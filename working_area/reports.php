@@ -24,11 +24,9 @@
 */	
 	
 	
-	$collection = new CappedCollection();
-	
 	$findForCurrentUser = array('user' => $user->getID());
 	
-	$msgs = $collection->find($findForCurrentUser);
+	$msgs = $cappedCollection->find($findForCurrentUser);
 
 	foreach ($msgs as $msg) {
 	    echo $msg['msg']." ".$msg['time']."<br>";

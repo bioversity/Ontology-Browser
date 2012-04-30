@@ -32,7 +32,8 @@
 		$params->Operation( kAPI_OP_LOGIN );
 		$params->Format( kTYPE_JSON );
 		$params->Database( 'TEST' );
-		$params->Container( CUser::DefaultContainer() ); 
+		$params->Container('CWarehouseWrapper');
+//		$params->Container( CUser::DefaultContainer() ); 
 		$params->Options( kAPI_OPT_SAFE, TRUE );
 		$params->UserCode( $username );
 		$params->UserPass( $password );
