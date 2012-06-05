@@ -37,7 +37,7 @@
 			// initialize the database connection
 			$this->mongo = new Mongo();
 			$this->db = $this->mongo->selectDB( "TEST" );
-			$this->collection = new CMongoContainer( $this->db->selectCollection( CUser::DefaultContainer() ) );
+			$this->collection = new CMongoContainer( $this->db->selectCollection( 'CWarehouseWrapper' ) );
 			
 			// find the user information
 			$userCollection = $this->collection->Container();

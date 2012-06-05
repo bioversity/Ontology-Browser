@@ -306,9 +306,11 @@
                     // alling to poshytip element
                     var $poshytip = $('.tip_form')
                     var offset = $poshytip.offset();
-                    var leftPos = (offset.left<($window.width()/2)) ? parseInt(offset.left+600) : parseInt(offset.left-200);
+                    // 610: dimension of tip_form, 300 dimension of details modal
+                    var leftPos = ((offset.left+610+300)<($window.width())) ? parseInt(offset.left+800) : parseInt(offset.left-170);
                     var topPos = offset.top;
-                    		$.prompt.jqi.css({
+                    //console.log((offset.left+610+300), ($window.width()))
+    		$.prompt.jqi.css({
 				position: "absolute",
 				top: topPos,//top
 				left: leftPos,//"70%",//$window.width()/2

@@ -57,7 +57,6 @@
          	 * check if the import fields are completed
          	 */
      		function checkDataset(form){
-     			console.log(form.dataset.value)
 	     		if(form.file.value==''){											// check if no file is selected
 	     			document.getElementById('working_area').style.opacity='1';
 	           		document.getElementById('loading').style.visibility='hidden';
@@ -207,6 +206,7 @@
             
             </div>
             <div id='loading' style="visibility: hidden"></div>
+        </div>
     </body>
 </html>
 

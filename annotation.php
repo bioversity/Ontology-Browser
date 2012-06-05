@@ -14,27 +14,35 @@
         <link rel="stylesheet" type="text/css" href="css/ontologybrowser.css">
         <link rel="stylesheet" type="text/css" href="css/details.css">
         <link rel="stylesheet" type="text/css" href="css/log.css">
-      
+        <link rel="stylesheet" type="text/css" href="css/ForceDirected.css">
+      	<link rel="stylesheet" type="text/css" href="css/base.css">
         <!-- import jquery -->
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="http://arborjs.org/js/jquery.address-1.4.min.js"></script>
+		<!-- import json definition -->
+         <script src="js/JSON/json2.js" type="text/javascript"></script> 
+         <!-- import javascript defines -->
+         <script src="js/defines/utilities.js"></script>
+         <script src="js/defines/jquery.ontologyBrowser.inc.js"></script>
          <!-- import ontology browser widget -->
-         <script src="JS/JSON/json2.js" type="text/javascript"></script> 
-         <script type="text/javascript" src="JS/jquery.ontologybrowser.js"></script>
+         <script type="text/javascript" src="js/jquery.ontologybrowser.js"></script>
          <!-- jquery for the details -->
-         <script type="text/javascript" src="JS/jquery-impromptu.js"></script>
+         <script type="text/javascript" src="js/jquery-impromptu.js"></script>
          <!-- tooltip javascript import -->
-         <script type="text/javascript" src="JS/glt.js"></script>
-         
+         <script type="text/javascript" src="js/glt.js"></script>
+         <!-- import jit to create graph -->
+		 <script language="javascript" type="text/javascript" src="js/jit.js"></script>
          <script>
             /**
              * call the ontologyBrowser plugin
              */ 
-            var CROPONTOLOGY_URL = "http://www.cropontology.org"; 
             $(function(){
                 $("table#table1 th").ontologyBrowser(function(termId, termName, elemClicked){
                     var elemClickedId = elemClicked['context'].id;
                     var newId = elemClicked['context'].id+"ontology" ;
-                    document.getElementById(newId).innerHTML=termName+" ["+termId+"]"; // put the id between [ ]
+                    document.getElementById(newId).innerHTML=termName; //+" ["+termId+"]"; // put the id between [ ]
+                    
                     changeColumn(elemClickedId, true);
                 });
             });
@@ -65,7 +73,7 @@
         		var values = new Array();	
             	for(var i=1; i<(tr.length+1); i++){
             		var string = $('#C'+i+'ontology').text();
-                    string = string.slice(string.indexOf('[')+1,string.indexOf(']'));
+                    //string = string.slice(string.indexOf('[')+1,string.indexOf(']'));
                     values.push(string);
             	}
             	if(!emptyArray(values))
@@ -98,28 +106,33 @@
                         loading();
                         document.getElementById('submit').style.visibility='hidden';
                         var currentId = $(this).attr('id');
-                        var $currentElement = $(this);
                         var currentValue = $(this).text();
-                        $.getJSON(CROPONTOLOGY_URL + "/search?callback=?&q=" + currentValue, function(data){ 
-                            if (data.length==1){
-                                changeColumn(currentId, false);
-                                $currentElement.attr('title', data[0].name+" [" + data[0].id + "]");
-                                document.getElementById(currentId+"ontology").innerHTML = data[0].name+" ["+data[0].id+"]";
-                            }
-                            if (data.length > 1){
-                                var title = "";
-                                for(var i=0; i<data.length; i++)
-                                    title += data[i].name+" [" + data[i].id +"]<br>";
-                                $currentElement.attr('title', title);
-                                document.getElementById(currentId+"ontology").innerHTML = data.length+' different terms';
-                            }
-                            j++;    
+                       
+						var queryID = '{"'+kOPERATOR_AND+'":[{"'+kAPI_QUERY_SUBJECT+'":"'+kTAG_LID+'","'+kAPI_QUERY_OPERATOR+'":"'+kOPERATOR_EQUAL+'","'+kAPI_QUERY_TYPE+'":"'+kTYPE_BINARY+'","'+kAPI_QUERY_DATA+'":{"'+kTAG_TYPE+'":"'+kTYPE_BINARY+'", "'+kTAG_DATA+'":"'+md5(currentValue)+'"}},{"'+kAPI_QUERY_SUBJECT+'":"'+kTAG_NODE+'", "'+kAPI_QUERY_OPERATOR+'":"'+kOPERATOR_NOT_NULL+'"}]}';
+						var queryCode = '{"'+kOPERATOR_AND+'":[{"'+kAPI_QUERY_SUBJECT+'":"'+kTAG_CODE+'","'+kAPI_QUERY_OPERATOR+'":"'+kOPERATOR_EQUAL+'","'+kAPI_QUERY_TYPE+'":"'+kTYPE_STRING+'","'+kAPI_QUERY_DATA+'":"'+currentValue+'"},{"'+kAPI_QUERY_SUBJECT+'":"'+kTAG_NODE+'", "'+kAPI_QUERY_OPERATOR+'":"'+kOPERATOR_NOT_NULL+'"}]}';
+						var queryName = '{"'+kOPERATOR_AND+'":[{"'+kAPI_QUERY_SUBJECT+'":"'+kTAG_NAME+':'+kTAG_DATA+'","'+kAPI_QUERY_OPERATOR+'":"'+kOPERATOR_CONTAINS_NOCASE+'","'+kAPI_QUERY_TYPE+'":"'+kTYPE_STRING+'","'+kAPI_QUERY_DATA+'":"'+currentValue.toLowerCase()+'"}]}'
+						
+						var query = '['+queryID+','+queryCode+','+queryName+']';
+                        
+					    $.getJSON(CROPONTOLOGY_URL + '?'+kAPI_OPERATION+'='+kAPI_OP_MATCH+'&'+kAPI_FORMAT+'='+kTYPE_JSON+'&'+kAPI_DATABASE+'='+kDEFAULT_DATABASE+'&'+kAPI_CONTAINER+'='+kDEFAULT_CONTAINER+'&'+kAPI_DATA_QUERY+'='+query, function(data){
+							if(data[kAPI_DATA_STATUS][kAPI_AFFECTED_COUNT] == 1){
+								var node = data[kAPI_DATA_RESPONSE][0][kTAG_NODE][0];
+								$.getJSON(CROPONTOLOGY_URL + '?'+kAPI_OPERATION+'='+kAPI_OP_GET_NODES+'&'+kAPI_FORMAT+'='+kTYPE_JSON+'&'+kAPI_DATABASE+'='+kDEFAULT_DATABASE+'&'+kAPI_CONTAINER+'='+kDEFAULT_CONTAINER+'&'+kAPI_OPT_IDENTIFIERS+'=['+node+']', function(dataNode){
+									if(dataNode[kAPI_DATA_RESPONSE][kAPI_RESPONSE_NODES][node][kTAG_KIND] && jQuery.inArray(kTYPE_MEASURE, dataNode[kAPI_DATA_RESPONSE][kAPI_RESPONSE_NODES][node][kTAG_KIND])>-1){
+										var valueTerm = dataNode[kAPI_DATA_RESPONSE][kAPI_RESPONSE_NODES][node][kTAG_TERM];
+										var valueInner = dataNode[kAPI_DATA_RESPONSE][kAPI_RESPONSE_TERMS][valueTerm][kTAG_GID]
+										changeColumn(currentId, false);
+		                                document.getElementById(currentId+"ontology").innerHTML = valueInner;
+	                               	}
+								})
+							}
+							j++;    
                             if (j==table.length){
                                 document.getElementById('working_area').style.opacity='1';
                                 document.getElementById('loading').style.visibility='hidden';
                                 document.getElementById('submit').style.visibility='visible';
-                            }
-                        })
+                            }				    
+						}) 
                     });  
                 });
             }
@@ -142,6 +155,11 @@
             
             
             <div id='working_area'>	
+			<!-- jit -->
+			<div id="center-container" style="display: none">
+    			<div id="infovis"></div>    
+			</div>
+			<!-- jit -->
                 <?php
                     include 'working_area/upload_file.php';
                 ?>
@@ -158,5 +176,6 @@
                 </div>
             </div>
             <div id='loading' style="visibility: hidden"></div>
+        </div>
     </body>
 </html>

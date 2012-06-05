@@ -251,7 +251,6 @@
 		 * function used to read the CSV files contenuted in the temporary folder
 		 * @param	$location		the current temporary folder
 		 * @param	$file			the current file to read
-		 * @param	$original		check if the file is the original or is created by the sistem
 		 * @return	html			10 rows table with the content of the file
 		 */
 		function readCSV($location, $file){
@@ -293,13 +292,13 @@
 	                $i++;
 	            }
 	            $return .= "</tr></thead><tbody>";
-	            $row = $csv -> getRows(); 	
 	            // index to look through the rows
-	            $i=0; 	 
-	            while($i<count($row) && $i<10){ 
+	            $i=1; 	 
+	            while($i<10){ 
+	           		$row = $csv -> getRow($i); 
 	                $return .= "<tr>";
 	                $j=1;
-	                foreach ($row[$i] AS $key => $value){
+	                foreach ($row AS $key => $value){
 	                    $return .= "<td class='C".$j." notSelected'>".htmlspecialchars($value)."</td>";
 	                    $j++;
 	                }

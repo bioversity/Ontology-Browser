@@ -1,17 +1,12 @@
 <?php
+//echo "<pre>"; print_r($_GET); echo "</pre>";
 		// Global includes.
 		require_once( '/Library/WebServer/Library/wrapper/includes.inc.php' );
 		// Class includes.
 		require_once( kPATH_LIBRARY_DEFINES."Session.inc.php" );
 		require_once( kPATH_LIBRARY_SOURCE."CWarehouseWrapper.inc.php" );
 
-		// import the folder class
-		require_once 'folder/folder.php';
-		// import the capped collection class
-		require_once 'logMessage/cappedCollection.php';
-		
 		$userID = $user->getID();
-		$folder = new Folder($userID);
 		
     if(isset($_GET['temporary'])){											// check if is setted the value of Get to execute directly doAnnotation
 	    if(file_exists($_GET['temporary']))	{								// check if the temporary folder exist
@@ -45,6 +40,7 @@
 					$store->updateFile($fileToStore, array(iORIGINAL=>TRUE));
 				}
 	            unlink($_GET['temporary'].$_GET['prevFile']);													// delete the previus file from temporary folder
+            	
             	$cappedCollection->insert(array(iCOLLECTIONUSER=>$userID, iMESSAGE=>$_GET['prevFile']." ".iCOMPLETED, iTIME=> iCURRENTDATE));
 			}
             
