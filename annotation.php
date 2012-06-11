@@ -16,10 +16,10 @@
         <link rel="stylesheet" type="text/css" href="css/log.css">
         <link rel="stylesheet" type="text/css" href="css/ForceDirected.css">
       	<link rel="stylesheet" type="text/css" href="css/base.css">
-        <!-- import jquery -->
+      	<link rel="stylesheet" type="text/css" href="css/children.css">
+		<!-- import jquery -->
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/jquery-ui.min.js"></script>
-        <script type="text/javascript" src="http://arborjs.org/js/jquery.address-1.4.min.js"></script>
 		<!-- import json definition -->
          <script src="js/JSON/json2.js" type="text/javascript"></script> 
          <!-- import javascript defines -->
@@ -33,6 +33,8 @@
          <script type="text/javascript" src="js/glt.js"></script>
          <!-- import jit to create graph -->
 		 <script language="javascript" type="text/javascript" src="js/jit.js"></script>
+		 <!-- import paging for list -->
+		 <script language="JavaScript" type="text/javascript" src="js/quickpager.jquery.js"></script>
          <script>
             /**
              * call the ontologyBrowser plugin
@@ -41,8 +43,9 @@
                 $("table#table1 th").ontologyBrowser(function(termId, termName, elemClicked){
                     var elemClickedId = elemClicked['context'].id;
                     var newId = elemClicked['context'].id+"ontology" ;
-                    document.getElementById(newId).innerHTML=termName; //+" ["+termId+"]"; // put the id between [ ]
-                    
+                    //document.getElementById(newId).innerHTML=termName; //+" ["+termId+"]"; // put the id between [ ]
+                    $("#"+newId).children("p").remove();
+                    $("#"+newId).append(termName);
                     changeColumn(elemClickedId, true);
                 });
             });
@@ -108,7 +111,7 @@
                         var currentId = $(this).attr('id');
                         var currentValue = $(this).text();
                        
-						var queryID = '{"'+kOPERATOR_AND+'":[{"'+kAPI_QUERY_SUBJECT+'":"'+kTAG_LID+'","'+kAPI_QUERY_OPERATOR+'":"'+kOPERATOR_EQUAL+'","'+kAPI_QUERY_TYPE+'":"'+kTYPE_BINARY+'","'+kAPI_QUERY_DATA+'":{"'+kTAG_TYPE+'":"'+kTYPE_BINARY+'", "'+kTAG_DATA+'":"'+md5(currentValue)+'"}},{"'+kAPI_QUERY_SUBJECT+'":"'+kTAG_NODE+'", "'+kAPI_QUERY_OPERATOR+'":"'+kOPERATOR_NOT_NULL+'"}]}';
+						var queryID = '{"'+kOPERATOR_AND+'":[{"'+kAPI_QUERY_SUBJECT+'":"'+kTAG_GID+'","'+kAPI_QUERY_OPERATOR+'":"'+kOPERATOR_EQUAL+'","'+kAPI_QUERY_TYPE+'":"'+kTYPE_STRING+'","'+kAPI_QUERY_DATA+'":"'+currentValue+'"},{"'+kAPI_QUERY_SUBJECT+'":"'+kTAG_NODE+'", "'+kAPI_QUERY_OPERATOR+'":"'+kOPERATOR_NOT_NULL+'"}]}';
 						var queryCode = '{"'+kOPERATOR_AND+'":[{"'+kAPI_QUERY_SUBJECT+'":"'+kTAG_CODE+'","'+kAPI_QUERY_OPERATOR+'":"'+kOPERATOR_EQUAL+'","'+kAPI_QUERY_TYPE+'":"'+kTYPE_STRING+'","'+kAPI_QUERY_DATA+'":"'+currentValue+'"},{"'+kAPI_QUERY_SUBJECT+'":"'+kTAG_NODE+'", "'+kAPI_QUERY_OPERATOR+'":"'+kOPERATOR_NOT_NULL+'"}]}';
 						var queryName = '{"'+kOPERATOR_AND+'":[{"'+kAPI_QUERY_SUBJECT+'":"'+kTAG_NAME+':'+kTAG_DATA+'","'+kAPI_QUERY_OPERATOR+'":"'+kOPERATOR_CONTAINS_NOCASE+'","'+kAPI_QUERY_TYPE+'":"'+kTYPE_STRING+'","'+kAPI_QUERY_DATA+'":"'+currentValue.toLowerCase()+'"}]}'
 						
@@ -120,9 +123,16 @@
 								$.getJSON(CROPONTOLOGY_URL + '?'+kAPI_OPERATION+'='+kAPI_OP_GET_NODES+'&'+kAPI_FORMAT+'='+kTYPE_JSON+'&'+kAPI_DATABASE+'='+kDEFAULT_DATABASE+'&'+kAPI_CONTAINER+'='+kDEFAULT_CONTAINER+'&'+kAPI_OPT_IDENTIFIERS+'=['+node+']', function(dataNode){
 									if(dataNode[kAPI_DATA_RESPONSE][kAPI_RESPONSE_NODES][node][kTAG_KIND] && jQuery.inArray(kTYPE_MEASURE, dataNode[kAPI_DATA_RESPONSE][kAPI_RESPONSE_NODES][node][kTAG_KIND])>-1){
 										var valueTerm = dataNode[kAPI_DATA_RESPONSE][kAPI_RESPONSE_NODES][node][kTAG_TERM];
-										var valueInner = dataNode[kAPI_DATA_RESPONSE][kAPI_RESPONSE_TERMS][valueTerm][kTAG_GID]
+										var valueInner = dataNode[kAPI_DATA_RESPONSE][kAPI_RESPONSE_TERMS][valueTerm][kTAG_GID];
+										var valueTitle = dataNode[kAPI_DATA_RESPONSE][kAPI_RESPONSE_TERMS][valueTerm][kTAG_NAME][0][kTAG_DATA];
+										var returnValue = $("<p></p>");
+										returnValue.append(valueInner);
+										returnValue.attr('title', valueTitle)
 										changeColumn(currentId, false);
-		                                document.getElementById(currentId+"ontology").innerHTML = valueInner;
+										var newId = currentId+"ontology";
+										$("#"+newId).children("p").remove();
+                    					$("#"+newId).append(returnValue);
+		                                //document.getElementById(currentId+"ontology").innerHTML = valueInner;
 	                               	}
 								})
 							}

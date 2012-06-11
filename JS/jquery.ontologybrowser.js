@@ -43,7 +43,14 @@
 	    this.init();
 	}
 	
-	
+	/**
+	 * define the array with the edges
+	 */
+	var EGDES_ARRAY = Array(kPRED_IS_A, kPRED_SCALE_OF, kPRED_METHOD_OF, kPRED_ENUM_OF, kPRED_COMPONENT_OF);
+	/**
+	 * inizialize the array with the value to return
+	 */
+	var returnArray = Array;
 	/**
 	 * @return: build the dialog calling varius function to create the tree
 	 */
@@ -64,13 +71,18 @@
 	                search($elem.text(), function(data) {
 	                    var content = "";
 	                    if(!data[kAPI_DATA_RESPONSE]) {
-	                        //buildListOntologiesList(null, $elem.text(), updateCallback);
 	                        buildOntologyList(Array, $elem.text(), true, updateCallback);
-	                    } else if(!data[kAPI_DATA_RESPONSE][0][kTAG_KIND] || data[kAPI_DATA_RESPONSE].length && data[kAPI_DATA_RESPONSE][0][kTAG_KIND][1] !=kTYPE_ROOT) {
-	                        buildOntologyList(data[kAPI_DATA_RESPONSE], $elem.text(), false, updateCallback);
 	                    } else {
-	                        //buildListOntologiesList(data[kAPI_DATA_RESPONSE][0], $elem.text(), updateCallback);
-	                        buildOntologyList(data[kAPI_DATA_RESPONSE], $elem.text(), true, updateCallback);
+	                    	for(var nodeID in data[kAPI_DATA_RESPONSE][kAPI_RESPONSE_NODES]){
+	                    		var nodeValue = data[kAPI_DATA_RESPONSE][kAPI_RESPONSE_NODES][nodeID][kTAG_DATA][kTAG_TERM];
+	                    		var searchResult = Array();
+	                    		searchResult.push(data[kAPI_DATA_RESPONSE][kAPI_RESPONSE_TERMS][nodeValue])
+	                    		if(!data[kAPI_DATA_RESPONSE][kAPI_RESPONSE_TERMS][nodeValue][kTAG_KIND] || (jQuery.inArray(kTYPE_ROOT, data[kAPI_DATA_RESPONSE][kAPI_RESPONSE_NODES][nodeID][kTAG_DATA][kTAG_KIND]) == -1)) {
+			                        buildOntologyList(searchResult, $elem.text(), false, updateCallback);
+			                    } else {
+			                        buildOntologyList(searchResult, $elem.text(), true, updateCallback);
+			                    }
+		                    }
 	                    }
 	                });
 	                return 'Loading...';
@@ -83,7 +95,7 @@
 	    
 	function search(text, callback) {
 		
-		var queryID = '{"'+kOPERATOR_AND+'":[{"'+kAPI_QUERY_SUBJECT+'":"'+kTAG_LID+'","'+kAPI_QUERY_OPERATOR+'":"'+kOPERATOR_EQUAL+'","'+kAPI_QUERY_TYPE+'":"'+kTYPE_BINARY+'","'+kAPI_QUERY_DATA+'":{"'+kTAG_TYPE+'":"'+kTYPE_BINARY+'", "'+kTAG_DATA+'":"'+md5(text)+'"}},{"'+kAPI_QUERY_SUBJECT+'":"'+kTAG_NODE+'", "'+kAPI_QUERY_OPERATOR+'":"'+kOPERATOR_NOT_NULL+'"}]}';
+		var queryID = '{"'+kOPERATOR_AND+'":[{"'+kAPI_QUERY_SUBJECT+'":"'+kTAG_GID+'","'+kAPI_QUERY_OPERATOR+'":"'+kOPERATOR_EQUAL+'","'+kAPI_QUERY_TYPE+'":"'+kTYPE_STRING+'","'+kAPI_QUERY_DATA+'":"'+text+'"},{"'+kAPI_QUERY_SUBJECT+'":"'+kTAG_NODE+'", "'+kAPI_QUERY_OPERATOR+'":"'+kOPERATOR_NOT_NULL+'"}]}';
 		var queryCode = '{"'+kOPERATOR_AND+'":[{"'+kAPI_QUERY_SUBJECT+'":"'+kTAG_CODE+'","'+kAPI_QUERY_OPERATOR+'":"'+kOPERATOR_EQUAL+'","'+kAPI_QUERY_TYPE+'":"'+kTYPE_STRING+'","'+kAPI_QUERY_DATA+'":"'+text+'"},{"'+kAPI_QUERY_SUBJECT+'":"'+kTAG_NODE+'", "'+kAPI_QUERY_OPERATOR+'":"'+kOPERATOR_NOT_NULL+'"}]}';
 		var queryName = '{"'+kOPERATOR_AND+'":[{"'+kAPI_QUERY_SUBJECT+'":"'+kTAG_NAME+':'+kTAG_DATA+'","'+kAPI_QUERY_OPERATOR+'":"'+kOPERATOR_CONTAINS_NOCASE+'","'+kAPI_QUERY_TYPE+'":"'+kTYPE_STRING+'","'+kAPI_QUERY_DATA+'":"'+text.toLowerCase()+'"}]}'
 		
@@ -95,7 +107,7 @@
 // 		
 		// var query = '['+queryGID+','+queryCode+','+queryName+']';
 		
-	    $.getJSON(CROPONTOLOGY_URL + '?'+kAPI_OPERATION+'='+kAPI_OP_MATCH+'&'+kAPI_FORMAT+'='+kTYPE_JSON+'&'+kAPI_DATABASE+'='+kDEFAULT_DATABASE+'&'+kAPI_CONTAINER+'='+kDEFAULT_CONTAINER+'&'+kAPI_DATA_QUERY+'='+query, callback)
+	    $.getJSON(CROPONTOLOGY_URL + '?'+kAPI_OPERATION+'='+kAPI_OP_MATCH_TERMS+'&'+kAPI_FORMAT+'='+kTYPE_JSON+'&'+kAPI_DATABASE+'='+kDEFAULT_DATABASE+'&'+kAPI_CONTAINER+'='+kDEFAULT_CONTAINER+'&'+kAPI_DATA_QUERY+'='+query, callback)
 	        .error(function(){ 
 	            callback(false);  
 	        });
@@ -138,10 +150,18 @@
             	}
             	else if(!data[kAPI_DATA_RESPONSE]) {
                     buildOntologyList(Array, searchValue, true, updateCallback);
-                } else if(!data[kAPI_DATA_RESPONSE][0][kTAG_KIND] || data[kAPI_DATA_RESPONSE].length && data[kAPI_DATA_RESPONSE][0][kTAG_KIND][1] !=kTYPE_ROOT) {
-                    buildOntologyList(data[kAPI_DATA_RESPONSE], searchValue, false, updateCallback);
                 } else {
-                    buildOntologyList(data[kAPI_DATA_RESPONSE], searchValue, true, updateCallback);
+                	for(var nodeID in data[kAPI_DATA_RESPONSE][kAPI_RESPONSE_NODES]){
+                		var nodeValue = data[kAPI_DATA_RESPONSE][kAPI_RESPONSE_NODES][nodeID][kTAG_DATA][kTAG_TERM];
+                		var searchResult = Array();
+                		searchResult.push(data[kAPI_DATA_RESPONSE][kAPI_RESPONSE_TERMS][nodeValue]);
+	                    if(!data[kAPI_DATA_RESPONSE][kAPI_RESPONSE_TERMS][nodeValue][kTAG_KIND] || (jQuery.inArray(kTYPE_ROOT, data[kAPI_DATA_RESPONSE][kAPI_RESPONSE_NODES][nodeID][kTAG_DATA][kTAG_KIND]) == -1)) {
+	                        buildOntologyList(searchResult, searchValue, false, updateCallback);
+	                    } 
+	                    else {
+	                        buildOntologyList(searchResult, searchValue, true, updateCallback);
+	                    }
+                    }
                 }
             });
             return 'Loading...';
@@ -171,6 +191,14 @@
         	buildOntologyList(searchResult, searchValue, isRoot, updateCallback);
         });
         $html.append(list)
+
+	 /*  	var fullScreen = $("<div class='tree'>fullScreen</div>");
+	   	fullScreen.click(function(){
+	   		document.getElementById('infovis-canvas').requestFullScreen(Element.ALLOW_KEYBOARD_INPUT); // Chrome
+			document.getElementById("infovis-canvas").mozRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT); //Firefox
+
+	   	})
+		$html.append(fullScreen);*/
 		/*
         if(searchResult.length==1){
 			var tree = $("<div class='tree'>view as tree</div>");
@@ -251,6 +279,7 @@
 					            domlabel.id = data.$labelid;
 					            domlabel.className = 'arrow-label';
 					            domlabel.innerHTML = data.$labeltext;
+					            domlabel.title = data.$labeltitle;
 					
 					            //if defined set same color as edge
 					            if(data.$color) {
@@ -355,6 +384,7 @@
 				          style = nameContainer.style;
 				      nameContainer.className = 'name';
 				      nameContainer.innerHTML = node.name;
+				      nameContainer.title = node.data.$titleName;
 				      //useButton.className = 'use';
 				      useButton.attr('class', 'useGraph');
 				      var useButtonValue = (node.data.$type=='triangle') ? 'use' : 'search';
@@ -366,7 +396,14 @@
 				      	var nameNode = node.name;
 						if(node.data.$type=='triangle'){
 							jQuery.prompt.close();
-				            onClick(node.id, node.data.$gid, $elemClicked);
+							var returnValue = $("<p></p>");
+							returnValue.append(node.data.$gid);
+							returnArc = $("<em></em>");
+							returnArc.css("visibility",'hidden');
+							returnArc.append(node.data.$arc);
+							returnValue.append(returnArc)
+							returnValue.attr('title',node.data.$titleName)
+				            onClick(node.id, returnValue, $elemClicked);
 				            closeDialog();
 						}
 						else{
@@ -374,7 +411,7 @@
 						}
 					  })
 				 	  detailsButton.attr('class', 'detailsGraph');
-					  detailsButton.append('details ,');
+					  detailsButton.append('details , ');
 					  detailsButton.css("cursor","pointer");
 					  detailsButton.click(function(e){
 							e.preventDefault();
@@ -417,53 +454,23 @@
 					        } else {
 					          delete node.selected;
 					        }
-					        if(dataChild._status.affected > 50){
-					        	var count = dataChild._status.affected;
-					        	var multi = {id:'multi', name:count+" nodes", data:{"$color": "#C74243","$type": "star"}};
+					        if(dataChild[kAPI_DATA_STATUS][kAPI_AFFECTED_COUNT] > 50){
+					        	var count = dataChild[kAPI_DATA_STATUS][kAPI_AFFECTED_COUNT];
+					        	var multi = {id:node.id+'multi', name:count+" nodes", data:{"$color": "#C74243","$type": "star","$titleName":"Click to view the children list"}};
 					        	fd.graph.addNode(multi);
-					        	fd.graph.addAdjacence(node,multi, {"$type": "labeled-arrow","$labeltext": ":ENUM-OF","$labelid": "multiVaue","$direction":true});
+					        	fd.graph.addAdjacence(node,multi, {"$type": "labeled-arrow","$labeltext":"children","$labelid":"multiVaue","$labeltitle":"all children","$direction":true});
 					        	fd.refresh();
-					        	$("div#multi").children(".detailsGraph").remove();
-					        	$("div#multi").children(".useGraph").remove();
+					        	$("div#"+node.id+"multi").children(".detailsGraph").remove();
+					        	$("div#"+node.id+"multi").children(".useGraph").remove();
 					        	var exclude = Array();
-					        	exclude.push(node.id)
-					        	$("div#multi").click(function(e){
+					        	exclude.push(node.id);
+					        	$("div#"+node.id+"multi").click(function(e){
 					        		e.preventDefault();
 					        		e.stopPropagation();
+					        		$("#childrenList").remove();
 					        		openChildren(dataChild._response, exclude, fd, node, count);
 					        	})
-					        	var subGraph = jQuery.parseJSON("["+normalizeGraph(dataChild, node.name)+"]");
-					        	fd.op.sum(subGraph, {
-						          type: 'fade:seq',
-						          duration: 100,
-						          hideLabels: false,
-						          transition: $jit.Trans.Quart.easeOut
-						        });
-						        // fd.op.contract(node, {
-					        		// type: 'animate',
-						          	// duration: 100,
-						          	// hideLabels: false,
-						          	// transition: $jit.Trans.Quart.easeOut
-						        // })
-						        // fd.refresh();
-						        // var newSpan = $("<span></span>");
-						        // newSpan.attr('class', 'childs');
-						        // newSpan.append("viewChilds");
-						        // var exclude = Array();
-					        	// exclude.push(node.id);
-					        	// var count = dataChild._status.affected;
-						        // newSpan.click(function(){
-						        	// console.log(node)
-						        	// // fd.op.expand(node, {
-						        		// // type: 'animate',
-							          	// // duration: 100,
-							          	// // hideLabels: false,
-							          	// // transition: $jit.Trans.Quart.easeOut
-						        	// // })
-						        	// openChildren(dataChild._response, exclude, fd, node, count);
-						        // })
-						        // fd.fx.plot();
-						        // $("#"+node.id).append("<br>").append(newSpan);
+					        	
 					        }
 					        else{
 								var subGraph = jQuery.parseJSON("["+normalizeGraph(dataChild, node.name)+"]");
@@ -532,7 +539,7 @@
 
 	}
  	
- 
+
     /**
      * @param: arr -> build the tree from the list of term
      * @return: the tree html
@@ -792,12 +799,13 @@
         for(var i=0; i<searchResult.length; i++){					// for each search result
 			if(!isRoot){
         		var term = searchResult[i];
-        		var getJson = CROPONTOLOGY_URL + '?'+kAPI_OPERATION+'='+kAPI_OP_GET_RELS+'&'+kAPI_FORMAT+'='+kTYPE_JSON+'&'+kAPI_DATABASE+'='+kDEFAULT_DATABASE+'&'+kAPI_CONTAINER+'='+kDEFAULT_CONTAINER+'&'+kAPI_OPT_IDENTIFIERS+'=['+term[kTAG_NODE]+']&'+kAPI_OPT_DIRECTION+'='+kAPI_DIRECTION_OUT+'&'+kAPI_OPT_LEVELS+'=-1';
+        		var getJson = CROPONTOLOGY_URL + '?'+kAPI_OPERATION+'='+kAPI_OP_GET_RELS+'&'+kAPI_FORMAT+'='+kTYPE_JSON+'&'+kAPI_DATABASE+'='+kDEFAULT_DATABASE+'&'+kAPI_CONTAINER+'='+kDEFAULT_CONTAINER+'&'+kAPI_OPT_IDENTIFIERS+'=['+term[kTAG_NODE]+']&'+kAPI_OPT_DIRECTION+'='+kAPI_DIRECTION_OUT+'&'+kAPI_OPT_LEVELS+'=-1&'+kAPI_OPT_PREDICATES+'=["'+implode('","',EGDES_ARRAY)+'"]';
         	}
        		else{
 	        	if(typeof searchResult[i] !== 'undefined' && searchResult[i] !== null){
-		        	var domain = '&'+kAPI_OPT_ATTRIBUTES+'={"'+kTAG_DOMAIN+'":["'+searchResult[i][kTAG_DOMAIN][0]+'"]}';
-		        	var getJson = CROPONTOLOGY_URL + '?'+kAPI_OPERATION+'='+kAPI_OP_GET_ROOTS+'&'+kAPI_FORMAT+'='+kTYPE_JSON+'&'+kAPI_DATABASE+'='+kDEFAULT_DATABASE+'&'+kAPI_CONTAINER+'='+kDEFAULT_CONTAINER+domain;
+		        	//var domain = '&'+kAPI_OPT_ATTRIBUTES+'={"'+kTAG_DOMAIN+'":["'+searchResult[i][kTAG_DOMAIN][0]+'"]}';
+		        	var queryRoot = '{"'+kOPERATOR_OR+'":[{"'+kAPI_QUERY_SUBJECT+'":"'+kTAG_DATA+'.'+kTAG_DOMAIN+'","'+kAPI_QUERY_OPERATOR+'":"'+kOPERATOR_EQUAL+'","'+kAPI_QUERY_TYPE+'":"'+kTYPE_STRING+'","'+kAPI_QUERY_DATA+'":"'+searchResult[i][kTAG_DOMAIN][0]+'"}]}';
+		        	var getJson = CROPONTOLOGY_URL + '?'+kAPI_OPERATION+'='+kAPI_OP_GET_ROOTS+'&'+kAPI_FORMAT+'='+kTYPE_JSON+'&'+kAPI_DATABASE+'='+kDEFAULT_DATABASE+'&'+kAPI_CONTAINER+'='+kDEFAULT_CONTAINER+'&:@query='+queryRoot;
 		        }
 		        else{
 		        	var getJson = CROPONTOLOGY_URL + '?'+kAPI_OPERATION+'='+kAPI_OP_GET_ROOTS+'&'+kAPI_FORMAT+'='+kTYPE_JSON+'&'+kAPI_DATABASE+'='+kDEFAULT_DATABASE+'&'+kAPI_CONTAINER+'='+kDEFAULT_CONTAINER;
@@ -826,12 +834,14 @@
 	 * @param $root			the jQuery element to add the result
 	 */
 	function createListRoot(searchResult, data, $root){
+		var nodes = data[kAPI_DATA_RESPONSE][kAPI_RESPONSE_NODES];
 		var dataTerm = data[kAPI_DATA_RESPONSE][kAPI_RESPONSE_TERMS];
 		jQuery.each(dataTerm, function(key,value){
+			var node = value[kTAG_NODE][0];
 			var gid = value[kTAG_GID];
 			var name = value[kTAG_NAME][0][kTAG_DATA];
 			var def = (value[kTAG_DEFINITION]) ? value[kTAG_DEFINITION][0][kTAG_DATA] : '';
-			var kind = (value[kTAG_KIND]) ? value[kTAG_KIND] : '';
+			var kind = (nodes[node][kTAG_KIND]) ? nodes[node][kTAG_KIND] : '';
 			var type = (value[kTAG_TYPE]) ? value[kTAG_TYPE] : '';
 			
 			var ul = $("<ul></ul>");
@@ -853,7 +863,7 @@
 			createElement(searchResult, value, tr, gid, name, def, kind, type);
 			
 			table.append(tr);
-			li.append(table);
+			ul.append(table);
 			ul.append(li)
 			$root.append(ul);
 		})
@@ -872,16 +882,18 @@
 		var documentApp = $("<div></div>");
 		
 		jQuery.each(term, function(key,value){
-			if(jQuery.inArray(kTYPE_PREDICATE, value[kTAG_KIND]) == -1){
+			if(jQuery.inArray(kTYPE_PREDICATE, value[kTAG_KIND]) == -1 && value[kTAG_NODE]){
+				var node = value[kTAG_NODE][0];
 				var gid = value[kTAG_GID];
 				var name = value[kTAG_NAME][0][kTAG_DATA];
 				var def = (value[kTAG_DEFINITION]) ? value[kTAG_DEFINITION][0][kTAG_DATA] : '';
-				var kind = (value[kTAG_KIND]) ? value[kTAG_KIND] : '';
+				var kind = (nodes[node][kTAG_KIND]) ? nodes[node][kTAG_KIND] : '';
 				var type = (value[kTAG_TYPE]) ? value[kTAG_TYPE] : '';
+				var id = value[kTAG_NODE][0];
 				
 				var ul = $("<ul></ul>");
 				//ul.css('padding-left','0px');
-				ul.attr('id', value[kTAG_NODE][0])
+				ul.attr('id', id)
 				var li = $("<li></li>");
 				//li.attr('id', value[kTAG_NODE][0]);
 				li.css('list-style-type','none');
@@ -898,74 +910,74 @@
 				createElement(searchResult, value, tr, gid, name, def, kind, type);
 				
 				table.append(tr);
-				li.append(table);
+				ul.append(table);
 				ul.append(li);
 				documentApp.append(ul)
 			}
 		})
-		
 		var arrayEdgesDone = Array(),
 			arrayNodesDone = Array();
 		
 		jQuery.each(edges, function(key, value){
-			var sub = value[kAPI_RESPONSE_SUBJECT];
-			var obj = value[kAPI_RESPONSE_OBJECT];
-			var pred = value[kAPI_RESPONSE_PREDICATE];
+				if (jQuery.inArray(value.p, EGDES_ARRAY)!=-1){
+				var sub = value[kAPI_RESPONSE_SUBJECT];
+				var obj = value[kAPI_RESPONSE_OBJECT];
+				var pred = value[kAPI_RESPONSE_PREDICATE];
+					
+				var subElement = ($root.find("#"+sub).length) ? $root.find("#"+sub) : documentApp.children("#"+sub), 
+					objElement = ($root.find("#"+obj).length) ? $root.find("#"+obj) :documentApp.children("#"+obj);
 				
-			var subElement = ($root.find("#"+sub).length) ? $root.find("#"+sub) : documentApp.children("#"+sub), 
-				objElement = ($root.find("#"+obj).length) ? $root.find("#"+obj) :documentApp.children("#"+obj);
-			
-			// subElement.clone(true).appendTo(documentApp)
-			// objElement.clone(true).appendTo(documentApp)
-			
-			if(jQuery.inArray(sub, arrayNodesDone)!=-1 && jQuery.inArray(key, arrayEdgesDone)==-1){
-				var termID = nodes[sub][kTAG_TERM];
-				var termValue = term[termID];
+				// subElement.clone(true).appendTo(documentApp)
+				// objElement.clone(true).appendTo(documentApp)
 				
-				var gid = termValue[kTAG_GID];
-				var name = termValue[kTAG_NAME][0][kTAG_DATA];
-				var def = (termValue[kTAG_DEFINITION]) ? termValue[kTAG_DEFINITION][0][kTAG_DATA] : '';
-				var kind = (termValue[kTAG_KIND]) ? termValue[kTAG_KIND] : '';
-				var type = (termValue[kTAG_TYPE]) ? termValue[kTAG_TYPE] : '';
-				
-				var tr = $("<tr></tr>");
-				var ul = $("<ul></ul>");
-				//ul.css('padding-left','0px');
-				ul.attr('id', termValue[kTAG_NODE][0])
-				var li = $("<li></li>");
-				//li.attr('id', value[kTAG_NODE][0]);
-				li.css('list-style-type','none');
-				li.css('display','inline');
-				var table = $("<table></table>");
-				table.css('border-width', '1px');
-				table.css('border-spacing', '2px');
-				table.css('border-style', 'hidden');
-				table.css('border-color', 'gray');
-				table.css('border-collapse', 'separate');
-				table.css('background-color', 'white');
-				var tr = $("<tr></tr>");
-				
-				createElement(searchResult, termValue, tr, gid, name, def, kind, type);
-				
-				table.append(tr);
-				li.append(table);
-				ul.append(li);
-				
-				$(objElement).children("li").append(ul);
-			}
-			else{
-				if($root.attr('id') == 'listView'){
-					//console.log(objElement, subElement)
-					objElement.children("li").append(subElement);
-					$root.append(objElement);
+				if(jQuery.inArray(sub, arrayNodesDone)!=-1 && jQuery.inArray(key, arrayEdgesDone)==-1){
+					var termID = nodes[sub][kTAG_TERM];
+					var termValue = term[termID];
+					
+					var gid = termValue[kTAG_GID];
+					var name = termValue[kTAG_NAME][0][kTAG_DATA];
+					var def = (termValue[kTAG_DEFINITION]) ? termValue[kTAG_DEFINITION][0][kTAG_DATA] : '';
+					var kind = (nodes[sub][kTAG_KIND]) ? nodes[sub][kTAG_KIND] : '';
+					var type = (termValue[kTAG_TYPE]) ? termValue[kTAG_TYPE] : '';
+					
+					var tr = $("<tr></tr>");
+					var ul = $("<ul></ul>");
+					//ul.css('padding-left','0px');
+					ul.attr('id', termValue[kTAG_NODE][0])
+					var li = $("<li></li>");
+					//li.attr('id', value[kTAG_NODE][0]);
+					li.css('list-style-type','none');
+					li.css('display','inline');
+					var table = $("<table></table>");
+					table.css('border-width', '1px');
+					table.css('border-spacing', '2px');
+					table.css('border-style', 'hidden');
+					table.css('border-color', 'gray');
+					table.css('border-collapse', 'separate');
+					table.css('background-color', 'white');
+					var tr = $("<tr></tr>");
+					
+					createElement(searchResult, termValue, tr, gid, name, def, kind, type);
+					table.append(tr);
+					ul.append(table);
+					ul.append(li);
+					
+					$(objElement).children("li").append(ul);
 				}
 				else{
-					$root.children("li").append(subElement);
+					if($root.attr('id') == 'listView'){
+						//console.log(objElement, subElement)
+						objElement.children("li").append(subElement);
+						$root.append(objElement);
+					}
+					else{
+						$root.children("li").append(subElement);
+					}
 				}
+				
+				arrayEdgesDone.push(key);	
+				arrayNodesDone.push(sub);
 			}
-			
-			arrayEdgesDone.push(key);	
-			arrayNodesDone.push(sub);
 		})
 	}
 	
@@ -987,12 +999,25 @@
 				if(tdGetChild.attr('class')=='expand'){
 					tdGetChild.attr('class', 'collapse').removeClass('expand');
 					$.getJSON(CROPONTOLOGY_URL + '?'+kAPI_OPERATION+'='+kAPI_OP_GET_RELS+'&'+kAPI_FORMAT+'='+kTYPE_JSON+'&'+kAPI_DATABASE+'='+kDEFAULT_DATABASE+'&'+kAPI_CONTAINER+'='+kDEFAULT_CONTAINER+'&'+kAPI_OPT_IDENTIFIERS+'=['+term[kTAG_NODE][0]+']&'+kAPI_OPT_DIRECTION+'='+kAPI_DIRECTION_IN, function(children){
+						//console.log(children._status.affected)
 						createListElements(searchResult, children, elementClicked);
+						if(children[kAPI_DATA_STATUS][kAPI_AFFECTED_COUNT] > 50){
+							$("#"+elementClicked[0].id).children("li").attr('class','paging');
+							$("li.paging").quickPager({
+								pagerLocation: "before"
+							});
+						}
 					})
 				}
 				else{
 					tdGetChild.attr('class', 'expand').removeClass('collapse');
-						elementClicked.children('li').children('ul').remove();
+					elementClicked.children('li').remove();
+					elementClicked.children('div').remove();
+					var li = $("<li></li>");
+					li.css('list-style-type','none');
+					li.css('display','inline');
+					elementClicked.append(li);
+						
 				}
 			})
 			tr.append(tdGetChild);
@@ -1059,8 +1084,7 @@
 			tdType.css('background-color', 'white');
 			tr.append(tdType);
 	*/
-//		console.log('kind',kind)
-		if(kind.indexOf(kTYPE_MEASURE) > -1){
+		if(kind.indexOf(kTYPE_MEASURE) != -1){
 			var tdUse = $("<td></td>");
 			tdUse.attr("class", "tdUse");
 			tdUse.append('Use');
@@ -1071,7 +1095,10 @@
 			tdUse.css('background-color', 'white');
 			tdUse.click(function(){
 				jQuery.prompt.close();
-	            onClick(term[kTAG_NODE][0], gid, $elemClicked);
+				var returnValue = $("<p></p>");
+				returnValue.append(gid);
+				returnValue.attr('title', name);
+	            onClick(term[kTAG_NODE][0], returnValue, $elemClicked);
 	            closeDialog();
 			})
 			tr.append(tdUse);
@@ -1211,7 +1238,6 @@
 						if(count == len){
 							childrenNodes.push(nodeJson)
 						}
-						
 					}
 					count++;
 				}
@@ -1247,10 +1273,11 @@
 			jQuery.each(nodes, function(key,value){
 				var nodeFromTerm = value[kTAG_TERM];
 				var nodeFromGid = term[nodeFromTerm][kTAG_GID];
+				var titleName = term[nodeFromTerm][kTAG_NAME][0][kTAG_DATA];
 				var isSearchedFrom = (searchValue == term[nodeFromTerm][kTAG_CODE]);
 				var nodeTypeFrom = (value[kTAG_TYPE]) ? "triangle" : (isSearchedFrom) ? "star" : "circle" ;
 				elementFrom = '{"adjacencies": [{"nodeTo": "'+key+'","nodeFrom": "'+key+'","data": {}}],';
-				elementFrom += '"data": {"$color": "#C74243","$type": "circle","$gid": "'+nodeFromGid+'"},';
+				elementFrom += '"data": {"$color": "#C74243","$type": "circle","$gid": "'+nodeFromGid+'", "$titleName":"'+titleName+'"},';
 				elementFrom += '"id": "'+key+'","name": "'+nodeFromTerm+'"}';
 				returnString = elementFrom;
 			})
@@ -1261,6 +1288,7 @@
 				nodeFromID = value.s;
 				var nodeFromTerm = nodes[nodeFromID][kTAG_TERM];
 				var nodeFromGid = term[nodeFromTerm][kTAG_GID];
+				var titleNameFrom = term[nodeFromTerm][kTAG_NAME][0][kTAG_DATA];
 				var isSearchedFrom = (searchValue == term[nodeFromTerm][kTAG_CODE]);
 				//var nodeFromName = term[nodeFromTerm][kTAG_NAME][0][kTAG_DATA];
 				var nodeFromName = term[nodeFromTerm][kTAG_CODE];
@@ -1284,11 +1312,13 @@
 				var nodeToTerm = nodes[nodeToID][kTAG_TERM];
 				var nodeToGid = term[nodeToTerm][kTAG_GID];
 				var nodeToName = term[nodeToTerm][kTAG_CODE];
+				var titleNameTo = term[nodeToTerm][kTAG_NAME][0][kTAG_DATA];
 				var isSearchedTo = (searchValue == term[nodeToTerm][kTAG_CODE]);
 				var nodeTypeTo = (nodes[nodeToID][kTAG_TYPE]) ? "triangle" : (isSearchedTo) ? "star" : "circle" ;
 				
 				var arcID = key;
 				var arcName = value.p;
+				var arcTitle = term[arcName][kTAG_NAME][0][kTAG_DATA];
 				
 				if(jQuery.inArray(elementTo, returnArray) == -1 && !$('#infovis-canvas').length || $('#'+nodeFromID).length || jQuery.inArray(nodeFromID, nodeCreated) != -1){
 					var direction = false;
@@ -1297,8 +1327,8 @@
 					var direction = true;
 				}
 
-				elementFrom = '{"adjacencies": [{"nodeTo": "'+nodeToID+'","nodeFrom": "'+nodeFromID+'","data": {"$type": "labeled-arrow","$labeltext": "'+arcName+'","$labelid": "'+arcID+'","$direction":'+direction+'}}],';
-				elementFrom += '"data": {"$color": "#C74243", "$type": "'+nodeTypeFrom+'","$gid": "'+nodeFromGid+'"},';
+				elementFrom = '{"adjacencies": [{"nodeTo": "'+nodeToID+'","nodeFrom": "'+nodeFromID+'","data": {"$type": "labeled-arrow","$labeltext": "'+arcName+'","$labelid":"'+arcID+'","$labeltitle":"'+arcTitle+'","$direction":'+direction+'}}],';
+				elementFrom += '"data": {"$color": "#C74243", "$type": "'+nodeTypeFrom+'","$gid": "'+nodeFromGid+'","$arc":"'+arcID+'","$titleName":"'+titleNameFrom+'"},';
 				elementFrom += '"id": "'+nodeFromID+'","name": "'+nodeFromName+'"}';
 				if(jQuery.inArray(elementFrom, returnArray) == -1 ){
 					returnArray.push(elementFrom);
@@ -1306,8 +1336,8 @@
 				}
 				
 				elementTo = '{"adjacencies": [],';
-				elementTo += '"data": {"$color": "#C74243", "$type": "'+nodeTypeTo+'","$gid": "'+nodeToGid+'"},'; 
-			    elementTo += '"id": "'+nodeToID+'","name": "'+nodeToName+'"}'
+				elementTo += '"data": {"$color": "#C74243", "$type": "'+nodeTypeTo+'","$gid": "'+nodeToGid+'","$arc":"'+arcID+'","$titleName":"'+titleNameTo+'"},'; 
+			    elementTo += '"id": "'+nodeToID+'","name": "'+nodeToName+'"}';
 			    
 			    if(jQuery.inArray(elementTo, returnArray) == -1 && jQuery.inArray(nodeToID, nodeCreated) == -1){
 					returnArray.push(elementTo);
@@ -1359,41 +1389,74 @@
 		    $details.append($name);
 		    var $def = $("<div class='attributes'><label class='details'>Definition</label><span class='details'>"+def+"</span></div>");
 		    (def) ? $details.append($def) : '';
+
 		    // call modal
 		    $.prompt($details.html(),{opacity: 0, persistent:false});
 	   	});
 	}
 	
 	/**
-	 * create the modal with the details
-	 * @param: gid -> the GID of the element clicked
-	 * 
-	 * @return the modal with the details
+	 * create the modal with the children list
 	 */
 	function openChildren(json, exclude, fd, node, countChildren){
 		jQuery.prompt.close();
 		var div = $("<div></div>");
-		//div.attr('id', 'jqi');
-		div.attr('class', 'ui-dialog-content');
+		div.attr('id', 'childrenList');
+		div.attr('class', 'jqi')
+		var close = $("<div></div>");
+		close.addClass('jqiclose');
+		close.append('X');
+		close.click(function(){
+			div.dialog("destroy");
+        	div.remove();
+		});
+		close.css('cursor','pointer');
+		div.append(close)
+		var term = json[kAPI_RESPONSE_TERMS];
+		var nodes = json[kAPI_RESPONSE_NODES];
+		var edges = json[kAPI_RESPONSE_EDGES];
+
 		var ul = $("<ul></ul>");
-		$.each(json.nodes, function(key, value){
+		// sistema da qua in poi 
+		jQuery.each(edges, function(key, value){
+			// node info
+			var nodeToAddID = value.s;
+			var nodeToAddTerm = nodes[nodeToAddID][kTAG_TERM];
+			var nodeToAddGid = term[nodeToAddTerm][kTAG_GID];
+			var titleNameNodeToAdd = term[nodeToAddTerm][kTAG_NAME][0][kTAG_DATA];
+			var nodeToAddName = term[nodeToAddTerm][kTAG_CODE];
+			
+			// edge info
+			var edgeID = key;
+			var edgeValue = value.p;
+			var edgeTitle = term[edgeValue][kTAG_NAME][0][kTAG_DATA];
+						
 			if(jQuery.inArray(key, exclude) == -1){
-				var nodeToAdd = {id:key, name:value[":TERM"], data:{"$color": "#C74243","$type": "star"}};
+
 				var li = $("<li></li>");
-				li.append(value[":TERM"]);
+				li.append(titleNameNodeToAdd);
 				li.css("cursor", "pointer");
+				li.css('list-style-type','none');
+				li.attr('title','Click to add to the graph');
 				li.click(function(){
-					var addNode = {id:key, name:value[":TERM"], data:{"$color": "#C74243","$type": "star"}};
-					fd.graph.addNode(addNode);
-		        	fd.graph.addAdjacence(node,addNode, {"$type": "labeled-arrow","$labeltext": ":ENUM-OF","$labelid": "multiVaue","$direction":true});
-		        	$("#multi").children().remove();
-		        	countChildren--;
+					var nodeToAdd = {"adjacencies": [], "data": {"$color": "#C74243", "$type":"circle","$gid":nodeToAddGid,"$arc":edgeID,"$titleName":titleNameNodeToAdd}, "id":nodeToAddID,"name":nodeToAddName};
+					fd.graph.addNode(nodeToAdd);
+		        	fd.graph.addAdjacence(node,nodeToAdd, {"$type": "labeled-arrow","$labeltext":edgeValue,"$labelid":edgeID,"$labeltitle":edgeTitle,"$direction":true});
+		        	$("#"+node.id+"multi").children().remove();
+		        	countChildren = countChildren-exclude.length;
 		        	var newSpan = $("<span></span>");
 		        	newSpan.attr('class','name');
 		        	newSpan.append(countChildren+" nodes");
-		        	$("#multi").append(newSpan)
+		        	newSpan.attr('title','Click to view the children list');
+		        	$("#"+node.id+"multi").append(newSpan);
+		        	if(countChildren == 0){
+		        		fd.graph.removeAdjacence(node.id, node.id+"multi");
+		        		fd.graph.removeNode(node.id+"multi");
+		        		$("#"+node.id+"multi").remove();
+		        	}
 		        	fd.refresh();
-		        	div.dialog("close");
+		        	div.dialog("destroy");
+		        	div.remove();
 		        	exclude.push(key);
 				})
 				ul.append(li);
@@ -1403,9 +1466,17 @@
 		    // call modal
 	   // $.prompt(ul.html(), {opacity: 0, persistent:false});
 	   // create dialog
-	   div.dialog({modal:true});
+		div.dialog({
+			closeText: '',
+	   		modal:true,
+	   		minWidth:200,
+	   		maxHeight:400
+	   	});
+	   $("#childrenList").children("ul").attr('class','paging');
+		$("ul.paging").quickPager({
+			pagerLocation: "both"
+		});
 	}
-	
 	
 		
 	/*

@@ -1261,6 +1261,29 @@ define( "kAPI_OP_GET_RELS",			'@GET_RELS' );
 	 * {@link kTYPE_ROOT root} {@link COntologyNode nodes} will be selected.
 	 */
 	define( "kAPI_OP_GET_ROOTS",		'@GET_ROOTS' );
+	/**
+	 * Match terms web-service.
+	 *
+	 * This is the tag that represents the match terms web-service operation, it is equivalent
+	 * to the inherited {@link kAPI_OP_MATCH kAPI_OP_MATCH} operation, except that it applies
+	 * to terms and will return the matching combination of terms and nodes.
+	 *
+	 * <ul>
+	 *	<li><i>{@link kAPI_RESPONSE_TERMS kAPI_RESPONSE_TERMS}</i>: The list of terms matched
+	 *		by the {@link kAPI_OP_MATCH match} service as follows:
+	 *	 <ul>
+	 *		<li><i>Key</i>: The {@link COntologyTerm term} global {@link kTAG_GID identifier}.
+	 *		<li><i>Value</i>: The contents of the {@link COntologyTerm term}.
+	 *	 </ul>
+	 *	<li><i>{@link kAPI_RESPONSE_NODES kAPI_RESPONSE_NODES}</i>: The list of found nodes
+	 *		related to the matched terms as follows:
+	 *	 <ul>
+	 *		<li><i>Key</i>: The node ID.
+	 *		<li><i>Value</i>: The node properties.
+	 *	 </ul>
+	 * </ul>
+	 */
+	define( "kAPI_OP_MATCH_TERMS",		'@MATCH_TERMS' );
 	
 	/*=======================================================================================
 	 *	DEFAULT OPTION ENUMERATIONS															*
@@ -2208,6 +2231,15 @@ define( "kAPI_OP_GET_RELS",			'@GET_RELS' );
 	 * This predicate indicates that the subject is part of the object.
 	 */
 	define( "kPRED_PART_OF",						':PART-OF' );
+	
+	/**
+	 * COMPONENT-OF.
+	 *
+	 * This is the tag that defines the COMPONENT-OF predicate.
+	 *
+	 * This predicate indicates that the subject is a component of the object.
+	 */
+	define( "kPRED_COMPONENT_OF",					':COMPONENT-OF' );
 	
 	/**
 	 * SCALE-OF.
